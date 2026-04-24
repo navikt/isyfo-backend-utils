@@ -1,19 +1,22 @@
 package no.nav.syfo.tilgang.azure
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.request.accept
+import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.Parameters
 import no.nav.syfo.tilgang.http.httpClientProxy
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
 class AzureAdClient(
     private val azureEnvironment: AzureEnvironment,
-    private val httpClient: HttpClient = httpClientProxy(),
+    private val httpClient: HttpClient = httpClientProxy()
 ) {
     suspend fun getOnBehalfOfToken(scopeClientId: String, token: String): AzureAdToken? = getAccessToken(
         Parameters.build {
@@ -50,7 +53,7 @@ class AzureAdClient(
     }
 
     private suspend fun getAccessToken(
-        formParameters: Parameters,
+        formParameters: Parameters
     ): AzureAdTokenResponse? =
         try {
             val response: HttpResponse = httpClient.post(azureEnvironment.openidConfigTokenEndpoint) {
@@ -71,9 +74,8 @@ class AzureAdClient(
     }
 
     companion object {
-        const val CACHE_AZUREAD_TOKEN_SYSTEM_KEY_PREFIX = "azuread-token-system-"
+        private const val CACHE_AZUREAD_TOKEN_SYSTEM_KEY_PREFIX = "azuread-token-system-"
         private val cache = ConcurrentHashMap<String, AzureAdToken>()
         private val log = LoggerFactory.getLogger(AzureAdClient::class.java)
     }
 }
-

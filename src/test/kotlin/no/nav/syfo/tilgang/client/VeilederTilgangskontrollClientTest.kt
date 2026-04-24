@@ -1,8 +1,10 @@
 package no.nav.syfo.tilgang.client
 
-import io.ktor.client.*
-import io.ktor.client.engine.mock.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respondError
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -10,12 +12,17 @@ import kotlinx.coroutines.runBlocking
 import no.nav.syfo.tilgang.azure.AzureAdClient
 import no.nav.syfo.tilgang.azure.AzureAdToken
 import no.nav.syfo.tilgang.http.commonConfig
+import no.nav.syfo.tilgang.testhelper.receiveBody
 import no.nav.syfo.tilgang.testhelper.respond
 import no.nav.syfo.tilgang.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.tilgang.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.tilgang.util.bearerHeader
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -30,7 +37,7 @@ class VeilederTilgangskontrollClientTest {
     private val personident = "12345678910"
     private val config = VeilederTilgangConfig(
         baseUrl = "isTilgangskontrollUrl",
-        clientId = "dev-fss.teamsykefravr.istilgangskontroll",
+        clientId = "dev-fss.teamsykefravr.istilgangskontroll"
     )
     private val azureAdClient = mockk<AzureAdClient>()
 
@@ -40,7 +47,7 @@ class VeilederTilgangskontrollClientTest {
             azureAdClient.getOnBehalfOfToken(any(), any())
         } returns AzureAdToken(
             accessToken = oboToken,
-            expires = LocalDateTime.now().plusHours(1),
+            expires = LocalDateTime.now().plusHours(1)
         )
     }
 
@@ -61,7 +68,7 @@ class VeilederTilgangskontrollClientTest {
             commonConfig()
             engine {
                 addHandler { request ->
-                    authorizationHeader = request.headers[io.ktor.http.HttpHeaders.Authorization].orEmpty()
+                    authorizationHeader = request.headers[HttpHeaders.Authorization].orEmpty()
                     personidentHeader = request.headers[NAV_PERSONIDENT_HEADER].orEmpty()
                     callIdHeader = request.headers[NAV_CALL_ID_HEADER].orEmpty()
                     respond(Tilgang(erGodkjent = true))
@@ -72,7 +79,7 @@ class VeilederTilgangskontrollClientTest {
         val client = VeilederTilgangskontrollClient(
             azureAdClient = azureAdClient,
             config = config,
-            httpClient = httpClient,
+            httpClient = httpClient
         )
 
         runBlocking {
@@ -144,9 +151,63 @@ class VeilederTilgangskontrollClientTest {
         }
     }
 
+    @Test
+    fun `veilederPersonerAccess returns filtered personident list and sends expected payload`() {
+        val requestedPersonidenter = listOf(personident, "10987654321")
+        lateinit var authorizationHeader: String
+        lateinit var callIdHeader: String
+        lateinit var requestBody: List<String>
+
+        val httpClient = HttpClient(MockEngine) {
+            commonConfig()
+            engine {
+                addHandler { request ->
+                    authorizationHeader = request.headers[HttpHeaders.Authorization].orEmpty()
+                    callIdHeader = request.headers[NAV_CALL_ID_HEADER].orEmpty()
+                    requestBody = request.receiveBody()
+                    respond(listOf(personident))
+                }
+            }
+        }
+
+        val client = VeilederTilgangskontrollClient(
+            azureAdClient = azureAdClient,
+            config = config,
+            httpClient = httpClient
+        )
+
+        val tilgang = runBlocking {
+            client.veilederPersonerAccess(
+                personidenter = requestedPersonidenter,
+                token = token,
+                callId = callId
+            )
+        }
+
+        assertEquals(listOf(personident), tilgang)
+        assertEquals(bearerHeader(oboToken), authorizationHeader)
+        assertEquals(callId, callIdHeader)
+        assertEquals(requestedPersonidenter, requestBody)
+    }
+
+    @Test
+    fun `veilederPersonerAccess returns null when istilgangskontroll responds forbidden`() {
+        val client = createMockClientForResponse(status = HttpStatusCode.Forbidden)
+
+        val tilgang = runBlocking {
+            client.veilederPersonerAccess(
+                personidenter = listOf(personident),
+                token = token,
+                callId = callId
+            )
+        }
+
+        assertNull(tilgang)
+    }
+
     private fun createMockClientForResponse(
         tilgang: Tilgang = Tilgang(erGodkjent = true),
-        status: HttpStatusCode = HttpStatusCode.OK,
+        status: HttpStatusCode = HttpStatusCode.OK
     ): VeilederTilgangskontrollClient {
         val httpClient = HttpClient(MockEngine) {
             commonConfig()
@@ -164,8 +225,7 @@ class VeilederTilgangskontrollClientTest {
         return VeilederTilgangskontrollClient(
             azureAdClient = azureAdClient,
             config = config,
-            httpClient = httpClient,
+            httpClient = httpClient
         )
     }
 }
-

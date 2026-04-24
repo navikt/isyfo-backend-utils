@@ -1,15 +1,22 @@
 package no.nav.syfo.tilgang.client
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.request.accept
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
-import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.tilgang.azure.AzureAdClient
 import no.nav.syfo.tilgang.http.httpClientDefault
 import no.nav.syfo.tilgang.util.NAV_CALL_ID_HEADER
@@ -21,7 +28,7 @@ class VeilederTilgangskontrollClient(
     private val azureAdClient: AzureAdClient,
     private val config: VeilederTilgangConfig,
     private val httpClient: HttpClient = httpClientDefault(),
-    meterRegistry: MeterRegistry = Metrics.globalRegistry,
+    meterRegistry: MeterRegistry = Metrics.globalRegistry
 ) {
     private val tilgangskontrollPersonUrl = "${config.baseUrl}$TILGANGSKONTROLL_PERSON_PATH"
     private val tilgangskontrollBrukereUrl = "${config.baseUrl}$TILGANGSKONTROLL_BRUKERE_PATH"
@@ -39,7 +46,7 @@ class VeilederTilgangskontrollClient(
     private suspend fun getTilgang(callId: String, personIdent: String, token: String): Tilgang? {
         val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
             scopeClientId = config.clientId,
-            token = token,
+            token = token
         )?.accessToken
             ?: throw RuntimeException("Failed to request access to Person: Failed to get OBO token")
 
@@ -76,11 +83,11 @@ class VeilederTilgangskontrollClient(
     suspend fun veilederPersonerAccess(
         personidenter: List<String>,
         token: String,
-        callId: String,
+        callId: String
     ): List<String>? {
         val oboToken = azureAdClient.getOnBehalfOfToken(
             scopeClientId = config.clientId,
-            token = token,
+            token = token
         )?.accessToken
             ?: throw RuntimeException("Failed to request access to list of persons: Failed to get OBO token")
 
@@ -89,7 +96,7 @@ class VeilederTilgangskontrollClient(
                 header(HttpHeaders.Authorization, bearerHeader(oboToken))
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
-                contentType(ContentType.Application.Json)
+                header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(personidenter)
             }
             response.body<List<String>>()
@@ -109,25 +116,24 @@ class VeilederTilgangskontrollClient(
 
     private fun handleUnexpectedResponseException(
         response: HttpResponse,
-        callId: String,
+        callId: String
     ) {
         log.error(
-            "Error while requesting access to person from istilgangskontroll with {}, {}",
-            StructuredArguments.keyValue("statusCode", response.status.value.toString()),
-            StructuredArguments.keyValue("callId", callId)
+            "Error while requesting access to person from istilgangskontroll: statusCode={}, callId={}",
+            response.status.value,
+            callId
         )
     }
 
     companion object {
         private val log = LoggerFactory.getLogger(VeilederTilgangskontrollClient::class.java)
 
-        const val TILGANGSKONTROLL_PERSON_PATH = "/api/tilgang/navident/person"
-        const val TILGANGSKONTROLL_BRUKERE_PATH = "/api/tilgang/navident/brukere"
+        private const val TILGANGSKONTROLL_PERSON_PATH = "/api/tilgang/navident/person"
+        private const val TILGANGSKONTROLL_BRUKERE_PATH = "/api/tilgang/navident/brukere"
 
-        const val CALL_TILGANGSKONTROLL_PERSON_BASE = "tilgangskontroll_person"
-        const val CALL_TILGANGSKONTROLL_PERSON_SUCCESS = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_success_count"
-        const val CALL_TILGANGSKONTROLL_PERSON_FAIL = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_fail_count"
-        const val CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_forbidden_count"
+        private const val CALL_TILGANGSKONTROLL_PERSON_BASE = "tilgangskontroll_person"
+        private const val CALL_TILGANGSKONTROLL_PERSON_SUCCESS = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_success_count"
+        private const val CALL_TILGANGSKONTROLL_PERSON_FAIL = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_fail_count"
+        private const val CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_forbidden_count"
     }
 }
-

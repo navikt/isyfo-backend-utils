@@ -1,15 +1,15 @@
 package no.nav.syfo.tilgang.ktor
 
 import com.auth0.jwt.JWT
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.routing.*
+import io.ktor.http.HttpHeaders
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.routing.RoutingContext
 import no.nav.syfo.tilgang.client.VeilederTilgangskontrollClient
 import no.nav.syfo.tilgang.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.tilgang.util.NAV_PERSONIDENT_HEADER
 
-const val JWT_CLAIM_AZP = "azp"
-const val JWT_CLAIM_NAVIDENT = "NAVident"
+internal const val JWT_CLAIM_AZP = "azp"
+internal const val JWT_CLAIM_NAVIDENT = "NAVident"
 
 fun ApplicationCall.getCallId(): String = this.request.headers[NAV_CALL_ID_HEADER].toString()
 
@@ -33,7 +33,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
     veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
     requiresWriteAccess: Boolean = false,
-    block: suspend () -> Unit,
+    block: suspend () -> Unit
 ) {
     val callId = call.getCallId()
     val token = call.getBearerHeader()
@@ -45,13 +45,13 @@ suspend fun RoutingContext.checkVeilederTilgang(
         veilederTilgangskontrollClient.hasWriteAccess(
             callId = callId,
             personIdent = personident,
-            token = token,
+            token = token
         )
     } else {
         veilederTilgangskontrollClient.hasAccess(
             callId = callId,
             personIdent = personident,
-            token = token,
+            token = token
         )
     }
 
@@ -61,4 +61,3 @@ suspend fun RoutingContext.checkVeilederTilgang(
         block()
     }
 }
-

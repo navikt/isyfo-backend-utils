@@ -2,16 +2,18 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 
 group = "no.nav.syfo"
 version = "0.0.1"
+description = "Shared Kotlin library for checking veileder access via istilgangskontroll"
 
 val jacksonDataTypeVersion = "2.21.2"
 val ktorVersion = "3.4.2"
 val logbackVersion = "1.5.32"
-val logstashEncoderVersion = "9.0"
 val micrometerVersion = "1.16.4"
 val mockkVersion = "1.14.9"
+val slf4jVersion = "2.0.17"
 
 plugins {
     kotlin("jvm") version "2.3.10"
+    `java-library`
     `maven-publish`
     id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -22,25 +24,21 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    // Public API types
+    api("io.ktor:ktor-client-core:$ktorVersion")
+    api("io.ktor:ktor-server-auth-jwt:$ktorVersion")
+    api("io.micrometer:micrometer-core:$micrometerVersion")
 
     // Ktor client – used by AzureAdClient and VeilederTilgangskontrollClient
-    implementation("io.ktor:ktor-client-apache:$ktorVersion")
+    implementation("io.ktor:ktor-client-apache5:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-jackson:$ktorVersion")
 
-    // Ktor server – ApplicationCall / RoutingContext extensions in PipelineUtil
-    // Also transitively provides com.auth0:java-jwt used for JWT.decode()
-    implementation("io.ktor:ktor-server-auth-jwt:$ktorVersion")
-
-    // Logging – logback is compileOnly so consuming apps own the runtime binding
-    compileOnly("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
-
-    // Metrics – core only; consuming apps add their own registry implementation
-    implementation("io.micrometer:micrometer-core:$micrometerVersion")
+    // Logging facade only; consuming apps own the runtime binding
+    implementation("org.slf4j:slf4j-api:$slf4jVersion")
 
     // Serialization
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonDataTypeVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDataTypeVersion")
 
     // Tests
@@ -55,8 +53,12 @@ kotlin {
     jvmToolchain(21)
 }
 
+java {
+    withSourcesJar()
+}
+
 tasks {
-    create("printVersion") {
+    register("printVersion") {
         doLast {
             println(project.version)
         }
@@ -74,11 +76,22 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        create<MavenPublication>("mavenJava") {
             groupId = "no.nav.syfo"
             artifactId = "isyfo-check-veiledertilgang-util"
             version = project.version.toString()
             from(components["java"])
+
+            pom {
+                name.set("isyfo-check-veiledertilgang-util")
+                description.set(project.description)
+                url.set("https://github.com/navikt/isyfo-check-veiledertilgang-util")
+                scm {
+                    url.set("https://github.com/navikt/isyfo-check-veiledertilgang-util")
+                    connection.set("scm:git:https://github.com/navikt/isyfo-check-veiledertilgang-util.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/navikt/isyfo-check-veiledertilgang-util.git")
+                }
+            }
         }
     }
     repositories {
@@ -91,4 +104,3 @@ publishing {
         }
     }
 }
-

@@ -1,14 +1,22 @@
 package no.nav.syfo.tilgang.ktor
 
-import io.ktor.http.*
-import io.ktor.server.routing.*
-import io.mockk.*
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
+import io.ktor.server.routing.RoutingCall
+import io.ktor.server.routing.RoutingContext
+import io.ktor.server.routing.RoutingRequest
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.syfo.tilgang.client.VeilederTilgangskontrollClient
 import no.nav.syfo.tilgang.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.tilgang.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.tilgang.util.bearerHeader
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class PipelineUtilTest {
@@ -37,7 +45,7 @@ class PipelineUtilTest {
         runBlocking {
             routingContext.checkVeilederTilgang(
                 action = action,
-                veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                veilederTilgangskontrollClient = veilederTilgangskontrollClient
             ) {
                 blockCalled = true
             }
@@ -71,7 +79,7 @@ class PipelineUtilTest {
             routingContext.checkVeilederTilgang(
                 action = action,
                 veilederTilgangskontrollClient = veilederTilgangskontrollClient,
-                requiresWriteAccess = true,
+                requiresWriteAccess = true
             ) {
                 blockCalled = true
             }
@@ -105,7 +113,7 @@ class PipelineUtilTest {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
                 ) {
                     blockCalled = true
                 }
@@ -131,7 +139,7 @@ class PipelineUtilTest {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
                 ) {}
             }
         }
@@ -157,7 +165,7 @@ class PipelineUtilTest {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
                 ) {}
             }
         }
@@ -182,4 +190,3 @@ class PipelineUtilTest {
         return routingContext
     }
 }
-

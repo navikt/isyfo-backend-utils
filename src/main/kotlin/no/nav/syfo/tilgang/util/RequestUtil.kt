@@ -1,7 +1,6 @@
 package no.nav.syfo.tilgang.util
 
-const val NAV_CALL_ID_HEADER = "Nav-Call-Id"
-const val NAV_PERSONIDENT_HEADER = "nav-personident"
+internal const val NAV_CALL_ID_HEADER = "Nav-Call-Id"
+internal const val NAV_PERSONIDENT_HEADER = "nav-personident"
 
-fun bearerHeader(token: String) = "Bearer $token"
-
+internal fun bearerHeader(token: String) = "Bearer $token"
