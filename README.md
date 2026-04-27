@@ -111,6 +111,31 @@ Set these request headers before using the Ktor helper:
 - `Nav-Call-Id`
 - `nav-personident`
 
+## Token Management
+
+### System Token Caching
+
+`AzureAdClient` automatically caches system tokens obtained via the `getSystemToken()` method to reduce unnecessary calls to Azure AD. This is useful when your service needs to authenticate with other services.
+
+**How it works:**
+- Tokens are cached per scope (client ID)
+- A cached token is reused if it's still valid
+- Tokens are considered expired when less than 60 seconds of lifetime remain
+- Cache is stored in memory; it does not persist across application restarts
+
+**Example:**
+```kotlin
+// First call fetches from Azure AD
+val token1 = azureAdClient.getSystemToken(scopeClientId = "api://my-service/.default")
+
+// Second call reuses cached token (no Azure AD call)
+val token2 = azureAdClient.getSystemToken(scopeClientId = "api://my-service/.default")
+```
+
+### On-Behalf-Of Tokens
+
+On-behalf-of (OBO) tokens obtained via `getOnBehalfOfToken()` are not cached. Each call results in a new token exchange with Azure AD, ensuring that access control changes (e.g., revoked permissions) are reflected immediately.
+
 ## Development
 
 Run the main validation steps locally:
