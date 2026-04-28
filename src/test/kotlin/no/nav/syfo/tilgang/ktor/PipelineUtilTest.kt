@@ -178,6 +178,119 @@ class PipelineUtilTest {
         }
     }
 
+    @Test
+    fun `explicit personident - calls hasAccess and executes block when read access is granted`() {
+        val routingContext = routingContextWithHeaders(
+            headers = Headers.build {
+                append(NAV_CALL_ID_HEADER, callId)
+                append(HttpHeaders.Authorization, bearerHeader(token))
+            }
+        )
+        var blockCalled = false
+
+        coEvery {
+            veilederTilgangskontrollClient.hasAccess(callId, personIdent, token)
+        } returns true
+
+        runBlocking {
+            routingContext.checkVeilederTilgang(
+                action = action,
+                personident = personIdent,
+                veilederTilgangskontrollClient = veilederTilgangskontrollClient
+            ) {
+                blockCalled = true
+            }
+        }
+
+        assertTrue(blockCalled)
+        coVerify(exactly = 1) {
+            veilederTilgangskontrollClient.hasAccess(callId, personIdent, token)
+        }
+    }
+
+    @Test
+    fun `explicit personident - calls hasWriteAccess and executes block when write access is granted`() {
+        val routingContext = routingContextWithHeaders(
+            headers = Headers.build {
+                append(NAV_CALL_ID_HEADER, callId)
+                append(HttpHeaders.Authorization, bearerHeader(token))
+            }
+        )
+        var blockCalled = false
+
+        coEvery {
+            veilederTilgangskontrollClient.hasWriteAccess(callId, personIdent, token)
+        } returns true
+
+        runBlocking {
+            routingContext.checkVeilederTilgang(
+                action = action,
+                personident = personIdent,
+                veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                requiresWriteAccess = true
+            ) {
+                blockCalled = true
+            }
+        }
+
+        assertTrue(blockCalled)
+        coVerify(exactly = 1) {
+            veilederTilgangskontrollClient.hasWriteAccess(callId, personIdent, token)
+        }
+    }
+
+    @Test
+    fun `explicit personident - throws forbidden when access is denied`() {
+        val routingContext = routingContextWithHeaders(
+            headers = Headers.build {
+                append(NAV_CALL_ID_HEADER, callId)
+                append(HttpHeaders.Authorization, bearerHeader(token))
+            }
+        )
+        var blockCalled = false
+
+        coEvery {
+            veilederTilgangskontrollClient.hasAccess(callId, personIdent, token)
+        } returns false
+
+        assertThrows(ForbiddenAccessVeilederException::class.java) {
+            runBlocking {
+                routingContext.checkVeilederTilgang(
+                    action = action,
+                    personident = personIdent,
+                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                ) {
+                    blockCalled = true
+                }
+            }
+        }
+
+        assertFalse(blockCalled)
+    }
+
+    @Test
+    fun `explicit personident - throws illegal argument when authorization header is missing`() {
+        val routingContext = routingContextWithHeaders(
+            headers = Headers.build {
+                append(NAV_CALL_ID_HEADER, callId)
+            }
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {
+            runBlocking {
+                routingContext.checkVeilederTilgang(
+                    action = action,
+                    personident = personIdent,
+                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                ) {}
+            }
+        }
+
+        coVerify(exactly = 0) {
+            veilederTilgangskontrollClient.hasAccess(any(), any(), any())
+        }
+    }
+
     private fun routingContextWithHeaders(headers: Headers): RoutingContext {
         val routingRequest = mockk<RoutingRequest>()
         every { routingRequest.headers } returns headers

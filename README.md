@@ -93,6 +93,8 @@ val accessiblePersonidenter: List<String>? = tilgangClient.veilederPersonerAcces
 
 ### 5. Use the Ktor convenience helper
 
+Reading personident from the `nav-personident` request header:
+
 ```kotlin
 route("/api") {
     get("/person") {
@@ -101,6 +103,24 @@ route("/api") {
             veilederTilgangskontrollClient = tilgangClient,
         ) {
             call.respond(HttpStatusCode.OK)
+        }
+    }
+}
+```
+
+Providing personident explicitly (e.g. when read from the request body):
+
+```kotlin
+route("/api") {
+    post("/person") {
+        val requestDTO = call.receive<RequestDTO>()
+        checkVeilederTilgang(
+            action = "write person",
+            personident = requestDTO.personident,
+            veilederTilgangskontrollClient = tilgangClient,
+            requiresWriteAccess = true,
+        ) {
+            call.respond(HttpStatusCode.Created)
         }
     }
 }
