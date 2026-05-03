@@ -44,6 +44,51 @@ githubPassword=<your-github-pat-with-read:packages-scope>
 
 In CI, set the `ORG_GRADLE_PROJECT_githubUser` and `ORG_GRADLE_PROJECT_githubPassword` environment variables — Gradle automatically maps these to the `githubUser` and `githubPassword` project properties. The `navikt/isworkflows` `kotlin-build-deploy.yml` workflow already does this.
 
+### Notes
+
+- The library depends only on the SLF4J API; consuming applications should provide their own logging backend.
+
+---
+
+## Development
+
+### Releasing a new version
+
+1. Bump `version` in `build.gradle.kts` and update the version in the `README.md` dependency coordinates
+2. Commit and push to `main`
+3. The [Publish workflow](.github/workflows/publish.yml) automatically runs lint, tests, and publishes the new version to GitHub Packages
+
+### Local development
+
+Run the main validation steps locally:
+
+```bash
+./gradlew clean test
+./gradlew ktlintCheck
+./gradlew jar
+```
+
+#### Testing changes in a consumer app without publishing
+
+Use `publishToMavenLocal` to install the library into your local Maven cache (`~/.m2`), then reference it from the consumer app without going through GitHub Packages:
+
+```bash
+# In this repo — publish current state to local cache
+./gradlew publishToMavenLocal
+```
+
+In the consumer's `build.gradle.kts`, add `mavenLocal()` **first** in the repositories block so it takes precedence over GitHub Packages:
+
+```kotlin
+repositories {
+    mavenLocal()  // picks up locally published version
+    maven { url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils") ... }
+}
+
+```
+
+Remember to remove `mavenLocal()` before merging — it should not be in the final build configuration.
+
 ---
 
 ## AzureAdClient
@@ -174,46 +219,4 @@ Required request headers when using the Ktor helper:
 - `nav-personident` (if not providing personident as argument)
 
 ---
-
-## Development
-
-### Releasing a new version
-
-1. Bump `version` in `build.gradle.kts` and update the version in the `README.md` dependency coordinates
-2. Commit and push to `main`
-3. The [Publish workflow](.github/workflows/publish.yml) automatically runs lint, tests, and publishes the new version to GitHub Packages
-
-### Local development
-
-Run the main validation steps locally:
-
-```bash
-./gradlew clean test
-./gradlew ktlintCheck
-./gradlew jar
-```
-
-#### Testing changes in a consumer app without publishing
-
-Use `publishToMavenLocal` to install the library into your local Maven cache (`~/.m2`), then reference it from the consumer app without going through GitHub Packages:
-
-```bash
-# In this repo — publish current state to local cache
-./gradlew publishToMavenLocal
-```
-
-In the consumer's `build.gradle.kts`, add `mavenLocal()` **first** in the repositories block so it takes precedence over GitHub Packages:
-
-```kotlin
-repositories {
-    mavenLocal()  // picks up locally published version
-    maven { url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils") ... }
-}
-```
-
-Remember to remove `mavenLocal()` before merging — it should not be in the final build configuration.
-
-## Notes
-
-- The library depends only on the SLF4J API; consuming applications should provide their own logging backend.
 
