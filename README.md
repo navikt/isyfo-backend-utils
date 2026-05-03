@@ -13,13 +13,36 @@ The library has no opinion on web framework — non-Ktor apps can use `AzureAdCl
 - `VeilederTilgangskontrollClient` — read/write access checks against `istilgangskontroll`
 - Ktor convenience helpers such as `checkVeilederTilgang(...)`
 
-## Adding the dependency
+## Adding the dependency in consumer apps
 
 Add the following dependency coordinates to your `build.gradle.kts`:
 
 ```kotlin
 implementation("no.nav.syfo:isyfo-backend-utils:0.0.4")
 ```
+
+Also add the GitHub Packages repository so Gradle knows where to fetch it from:
+
+```kotlin
+repositories {
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils")
+        credentials {
+            username = project.findProperty("githubUser") as String?
+            password = project.findProperty("githubPassword") as String?
+        }
+    }
+}
+```
+
+Here credentials are resolved from Gradle project properties. You can add the following to `~/.gradle/gradle.properties` to be able to install the package for local development of the consumer app:
+
+```properties
+githubUser=<your-github-username>
+githubPassword=<your-github-pat-with-read:packages-scope>
+```
+
+In CI, set the `ORG_GRADLE_PROJECT_githubUser` and `ORG_GRADLE_PROJECT_githubPassword` environment variables — Gradle automatically maps these to the `githubUser` and `githubPassword` project properties. The `navikt/isworkflows` `kotlin-build-deploy.yml` workflow already does this.
 
 ---
 
@@ -168,8 +191,27 @@ Run the main validation steps locally:
 ./gradlew clean test
 ./gradlew ktlintCheck
 ./gradlew jar
+```
+
+#### Testing changes in a consumer app without publishing
+
+Use `publishToMavenLocal` to install the library into your local Maven cache (`~/.m2`), then reference it from the consumer app without going through GitHub Packages:
+
+```bash
+# In this repo — publish current state to local cache
 ./gradlew publishToMavenLocal
 ```
+
+In the consumer's `build.gradle.kts`, add `mavenLocal()` **first** in the repositories block so it takes precedence over GitHub Packages:
+
+```kotlin
+repositories {
+    mavenLocal()  // picks up locally published version
+    maven { url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils") ... }
+}
+```
+
+Remember to remove `mavenLocal()` before merging — it should not be in the final build configuration.
 
 ## Notes
 
