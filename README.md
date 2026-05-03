@@ -1,23 +1,21 @@
 # isyfo-backend-utils
 
-Shared Kotlin/JVM library for checking veileder access to persons through `istilgangskontroll`.
+Shared Kotlin/JVM utility library for iSyfo backend services. Currently focused on veileder access control via `istilgangskontroll`, but intended to grow with other shared backend utilities over time.
 
 ## What it provides
 
-The library includes:
-- `AzureAdClient` for Azure AD token exchange
-- `VeilederTilgangskontrollClient` for read/write access checks against `istilgangskontroll`
+### Veileder access control
+- `AzureAdClient` — Azure AD token exchange (system tokens and OBO tokens)
+- `VeilederTilgangskontrollClient` — read/write access checks against `istilgangskontroll`
 - Ktor convenience helpers such as `checkVeilederTilgang(...)`
 
 ## Intended consumers
 
-This library is intended for Kotlin/JVM services that:
-- run on NAV infrastructure
-- use Ktor on the server side
-- need to call `istilgangskontroll`
-- already manage their own logging backend
+This library is intended for Kotlin/JVM services in the isyfo domain that run on NAV infrastructure. It has no opinion on web framework — non-Ktor apps can use `AzureAdClient` and `VeilederTilgangskontrollClient` directly. The Ktor helpers are opt-in.
 
-## Dependency coordinates
+## Adding the dependency
+
+Add the following dependency coordinates to your `build.gradle.kts`:
 
 ```kotlin
 implementation("no.nav.syfo:isyfo-backend-utils:0.0.3")
@@ -38,9 +36,11 @@ Primary entry points:
 - `hasWriteAccess(...)` returns `true` only when `erGodkjent == true && fullTilgang == true`
 - forbidden access from `istilgangskontroll` is treated as a normal access-denied outcome
 
-## Minimal usage
+## Usage
 
-### 1. Create Azure AD client
+### Setup (required)
+
+Set up the client.
 
 ```kotlin
 val azureEnvironment = AzureEnvironment(
@@ -51,12 +51,8 @@ val azureEnvironment = AzureEnvironment(
 )
 
 val azureAdClient = AzureAdClient(azureEnvironment = azureEnvironment)
-```
 
-### 2. Create tilgang client
-
-```kotlin
-val tilgangClient = VeilederTilgangskontrollClient(
+val tilgangskontrollClient = VeilederTilgangskontrollClient(
     azureAdClient = azureAdClient,
     config = VeilederTilgangConfig(
         baseUrl = "https://istilgangskontroll",
@@ -65,33 +61,35 @@ val tilgangClient = VeilederTilgangskontrollClient(
 )
 ```
 
-### 3. Check access directly
+### Option A: Check access directly
 
 ```kotlin
-val hasReadAccess = tilgangClient.hasAccess(
+val hasReadAccess = tilgangskontrollClient.hasAccess(
     callId = "call-id",
     personIdent = "12345678910",
     token = incomingToken,
 )
 
-val hasWriteAccess = tilgangClient.hasWriteAccess(
+val hasWriteAccess = tilgangskontrollClient.hasWriteAccess(
     callId = "call-id",
     personIdent = "12345678910",
     token = incomingToken,
 )
 ```
 
-### 4. Check batch access
+### Option B: Check batch access
 
 ```kotlin
-val accessiblePersonidenter: List<String>? = tilgangClient.veilederPersonerAccess(
+val accessiblePersonidenter: List<String>? = tilgangskontrollClient.veilederPersonerAccess(
     personidenter = listOf("12345678910", "10987654321"),
     token = incomingToken,
     callId = "call-id",
 )
 ```
 
-### 5. Use the Ktor convenience helper
+### Option C: Use the Ktor convenience helper
+
+The `checkVeilederTilgang()` Ktor helper can wrap any block of code that requires a specific access level. It can be used to wrap code in route handlers. It handles extracting the personident from the request header (if not provided as argument, see below), calling the appropriate access check method, and responding with `403 Forbidden` if access is denied.
 
 Reading personident from the `nav-personident` request header:
 
@@ -100,7 +98,7 @@ route("/api") {
     get("/person") {
         checkVeilederTilgang(
             action = "read person",
-            veilederTilgangskontrollClient = tilgangClient,
+            veilederTilgangskontrollClient = tilgangskontrollClient,
         ) {
             call.respond(HttpStatusCode.OK)
         }
@@ -117,7 +115,7 @@ route("/api") {
         checkVeilederTilgang(
             action = "write person",
             personident = requestDTO.personident,
-            veilederTilgangskontrollClient = tilgangClient,
+            veilederTilgangskontrollClient = tilgangskontrollClient,
             requiresWriteAccess = true,
         ) {
             call.respond(HttpStatusCode.Created)
@@ -129,7 +127,7 @@ route("/api") {
 Set these request headers before using the Ktor helper:
 - `Authorization: Bearer <token>`
 - `Nav-Call-Id`
-- `nav-personident`
+- `nav-personident` (if not providing personident as argument)
 
 ## Token Management
 
@@ -154,7 +152,7 @@ val token2 = azureAdClient.getSystemToken(scopeClientId = "api://my-service/.def
 
 ### On-Behalf-Of Tokens
 
-On-behalf-of (OBO) tokens obtained via `getOnBehalfOfToken()` are not cached. Each call results in a new token exchange with Azure AD, ensuring that access control changes (e.g., revoked permissions) are reflected immediately.
+On-behalf-of (OBO) tokens obtained via `getOnBehalfOfToken()` are not cached. Each call results in a new token exchange with Azure AD. This is intentional — OBO tokens are user-scoped and short-lived, making caching add complexity without meaningful benefit.
 
 ## Development
 
