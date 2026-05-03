@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgang.util
+package no.nav.syfo.util
 
 internal const val NAV_CALL_ID_HEADER = "Nav-Call-Id"
 internal const val NAV_PERSONIDENT_HEADER = "nav-personident"

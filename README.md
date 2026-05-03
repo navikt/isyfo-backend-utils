@@ -18,7 +18,7 @@ The library has no opinion on web framework — non-Ktor apps can use `AzureAdCl
 Add the following dependency coordinates to your `build.gradle.kts`:
 
 ```kotlin
-implementation("no.nav.syfo:isyfo-backend-utils:0.0.3")
+implementation("no.nav.syfo:isyfo-backend-utils:0.0.4")
 ```
 
 ---

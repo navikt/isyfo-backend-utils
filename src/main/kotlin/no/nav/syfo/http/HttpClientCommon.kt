@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgang.http
+package no.nav.syfo.http
 
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -9,7 +9,7 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.jackson.jackson
-import no.nav.syfo.tilgang.util.configure
+import no.nav.syfo.util.configure
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner
 import java.net.ProxySelector
 

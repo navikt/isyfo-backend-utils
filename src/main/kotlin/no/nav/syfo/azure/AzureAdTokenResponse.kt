@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgang.azure
+package no.nav.syfo.azure
 
 import java.time.LocalDateTime
 

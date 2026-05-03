@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgang.client
+package no.nav.syfo.tilgangskontroll.client
 
 data class VeilederTilgangConfig(
     val baseUrl: String,

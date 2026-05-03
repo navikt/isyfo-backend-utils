@@ -1,12 +1,12 @@
-package no.nav.syfo.tilgang.ktor
+package no.nav.syfo.tilgangskontroll.ktor
 
 import com.auth0.jwt.JWT
 import io.ktor.http.HttpHeaders
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.routing.RoutingContext
-import no.nav.syfo.tilgang.client.VeilederTilgangskontrollClient
-import no.nav.syfo.tilgang.util.NAV_CALL_ID_HEADER
-import no.nav.syfo.tilgang.util.NAV_PERSONIDENT_HEADER
+import no.nav.syfo.tilgangskontroll.client.VeilederTilgangskontrollClient
+import no.nav.syfo.util.NAV_CALL_ID_HEADER
+import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 
 internal const val JWT_CLAIM_AZP = "azp"
 internal const val JWT_CLAIM_NAVIDENT = "NAVident"

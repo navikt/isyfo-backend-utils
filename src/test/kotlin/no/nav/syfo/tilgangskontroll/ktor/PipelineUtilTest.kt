@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgang.ktor
+package no.nav.syfo.tilgangskontroll.ktor
 
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
@@ -10,10 +10,10 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.tilgang.client.VeilederTilgangskontrollClient
-import no.nav.syfo.tilgang.util.NAV_CALL_ID_HEADER
-import no.nav.syfo.tilgang.util.NAV_PERSONIDENT_HEADER
-import no.nav.syfo.tilgang.util.bearerHeader
+import no.nav.syfo.tilgangskontroll.client.VeilederTilgangskontrollClient
+import no.nav.syfo.util.NAV_CALL_ID_HEADER
+import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
+import no.nav.syfo.util.bearerHeader
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue

@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgang.client
+package no.nav.syfo.tilgangskontroll.client
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -8,10 +8,10 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.tilgang.azure.AzureAdClient
-import no.nav.syfo.tilgang.azure.AzureAdToken
-import no.nav.syfo.tilgang.http.commonConfig
-import no.nav.syfo.tilgang.testhelper.respond
+import no.nav.syfo.azure.AzureAdClient
+import no.nav.syfo.azure.AzureAdToken
+import no.nav.syfo.http.commonConfig
+import no.nav.syfo.testhelper.respond
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
