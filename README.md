@@ -20,7 +20,7 @@ This library is intended for Kotlin/JVM services that:
 ## Dependency coordinates
 
 ```kotlin
-implementation("no.nav.syfo:isyfo-backend-utils:0.0.2")
+implementation("no.nav.syfo:isyfo-backend-utils:0.0.3")
 ```
 
 ## Public API
