@@ -13,7 +13,7 @@ internal const val JWT_CLAIM_NAVIDENT = "NAVident"
 
 fun ApplicationCall.getCallId(): String = this.request.headers[NAV_CALL_ID_HEADER].toString()
 
-fun ApplicationCall.getPersonIdent(): String? = this.request.headers[NAV_PERSONIDENT_HEADER]
+fun ApplicationCall.getPersonident(): String? = this.request.headers[NAV_PERSONIDENT_HEADER]
 
 fun ApplicationCall.getConsumerClientId(): String? =
     getBearerHeader()?.let {
@@ -35,7 +35,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
 ) {
-    val personident = call.getPersonIdent()
+    val personident = call.getPersonident()
         ?: throw IllegalArgumentException("Failed to $action: No $NAV_PERSONIDENT_HEADER supplied in request header")
 
     checkVeilederTilgang(
@@ -61,13 +61,13 @@ suspend fun RoutingContext.checkVeilederTilgang(
     val hasAccess = if (requiresWriteAccess) {
         veilederTilgangskontrollClient.hasWriteAccess(
             callId = callId,
-            personIdent = personident,
+            personident = personident,
             token = token
         )
     } else {
         veilederTilgangskontrollClient.hasAccess(
             callId = callId,
-            personIdent = personident,
+            personident = personident,
             token = token
         )
     }

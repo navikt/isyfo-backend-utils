@@ -43,7 +43,7 @@ class VeilederTilgangskontrollClient(
         .description("Counts the number of forbidden calls to istilgangskontroll - person")
         .register(meterRegistry)
 
-    private suspend fun getTilgang(callId: String, personIdent: String, token: String): Tilgang? {
+    private suspend fun getTilgang(callId: String, personident: String, token: String): Tilgang? {
         val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
             scopeClientId = config.clientId,
             token = token
@@ -53,7 +53,7 @@ class VeilederTilgangskontrollClient(
         return try {
             val tilgangResponse = httpClient.get(tilgangskontrollPersonUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(onBehalfOfToken))
-                header(NAV_PERSONIDENT_HEADER, personIdent)
+                header(NAV_PERSONIDENT_HEADER, personident)
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
             }
@@ -70,12 +70,12 @@ class VeilederTilgangskontrollClient(
         }
     }
 
-    suspend fun hasAccess(callId: String, personIdent: String, token: String): Boolean {
-        return getTilgang(callId, personIdent, token)?.erGodkjent ?: false
+    suspend fun hasAccess(callId: String, personident: String, token: String): Boolean {
+        return getTilgang(callId, personident, token)?.erGodkjent ?: false
     }
 
-    suspend fun hasWriteAccess(callId: String, personIdent: String, token: String): Boolean {
-        return getTilgang(callId, personIdent, token)?.let {
+    suspend fun hasWriteAccess(callId: String, personident: String, token: String): Boolean {
+        return getTilgang(callId, personident, token)?.let {
             it.erGodkjent && it.fullTilgang
         } ?: false
     }

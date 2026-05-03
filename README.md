@@ -18,7 +18,7 @@ The library has no opinion on web framework — non-Ktor apps can use `AzureAdCl
 Add the following dependency coordinates to your `build.gradle.kts`:
 
 ```kotlin
-implementation("no.nav.syfo:isyfo-backend-utils:0.0.4")
+implementation("no.nav.syfo:isyfo-backend-utils:0.0.5")
 ```
 
 Also add the GitHub Packages repository so Gradle knows where to fetch it from:
@@ -155,13 +155,13 @@ val tilgangskontrollClient = VeilederTilgangskontrollClient(
 ```kotlin
 val hasReadAccess = tilgangskontrollClient.hasAccess(
     callId = "call-id",
-    personIdent = "12345678910",
+    personident = "12345678910",
     token = incomingToken,
 )
 
 val hasWriteAccess = tilgangskontrollClient.hasWriteAccess(
     callId = "call-id",
-    personIdent = "12345678910",
+    personident = "12345678910",
     token = incomingToken,
 )
 ```
