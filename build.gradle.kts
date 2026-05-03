@@ -98,8 +98,8 @@ publishing {
         maven {
             url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = System.getenv("ORG_GRADLE_PROJECT_githubUser")
+                password = System.getenv("ORG_GRADLE_PROJECT_githubPassword")
             }
         }
     }

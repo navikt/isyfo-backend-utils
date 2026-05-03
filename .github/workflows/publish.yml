@@ -6,6 +6,7 @@ on:
 
 jobs:
   publish:
+    name: Build, test and publish to GitHub Packages
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -14,12 +15,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      - uses: gradle/actions/setup-gradle@v4
-      - name: Test and publish
-        run: ./gradlew test publish
+          distribution: zulu
+          java-version: 21
+          cache: gradle
+      - name: Run lint
+        run: ./gradlew ktlintCheck
+      - name: Run tests
+        run: ./gradlew test
+      - name: Publish
+        run: ./gradlew publish
         env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GRADLE_PROJECT_githubUser: x-access-token
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
 
