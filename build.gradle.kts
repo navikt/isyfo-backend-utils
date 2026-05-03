@@ -78,25 +78,25 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = "no.nav.syfo"
-            artifactId = "isyfo-check-veiledertilgang-util"
+            artifactId = "isyfo-backend-utils"
             version = project.version.toString()
             from(components["java"])
 
             pom {
-                name.set("isyfo-check-veiledertilgang-util")
+                name.set("isyfo-backend-utils")
                 description.set(project.description)
-                url.set("https://github.com/navikt/isyfo-check-veiledertilgang-util")
+                url.set("https://github.com/navikt/isyfo-backend-utils")
                 scm {
-                    url.set("https://github.com/navikt/isyfo-check-veiledertilgang-util")
-                    connection.set("scm:git:https://github.com/navikt/isyfo-check-veiledertilgang-util.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/navikt/isyfo-check-veiledertilgang-util.git")
+                    url.set("https://github.com/navikt/isyfo-backend-utils")
+                    connection.set("scm:git:https://github.com/navikt/isyfo-backend-utils.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/navikt/isyfo-backend-utils.git")
                 }
             }
         }
     }
     repositories {
         maven {
-            url = uri("https://maven.pkg.github.com/navikt/isyfo-check-veiledertilgang-util")
+            url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")

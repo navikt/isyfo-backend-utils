@@ -1,1 +1,1 @@
-rootProject.name = "isyfo-check-veiledertilgang-util"
+rootProject.name = "isyfo-backend-utils"

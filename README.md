@@ -1,4 +1,4 @@
-# isyfo-check-veiledertilgang-util
+# isyfo-backend-utils
 
 Shared Kotlin/JVM library for checking veileder access to persons through `istilgangskontroll`.
 
@@ -20,7 +20,7 @@ This library is intended for Kotlin/JVM services that:
 ## Dependency coordinates
 
 ```kotlin
-implementation("no.nav.syfo:isyfo-check-veiledertilgang-util:0.0.1")
+implementation("no.nav.syfo:isyfo-backend-utils:0.0.1")
 ```
 
 ## Public API
