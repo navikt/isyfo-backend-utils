@@ -158,6 +158,14 @@ On-behalf-of (OBO) tokens obtained via `getOnBehalfOfToken()` are not cached. Ea
 
 ## Development
 
+### Releasing a new version
+
+1. Bump `version` in `build.gradle.kts` and update the version in the `README.md` dependency coordinates
+2. Commit and push to `main`
+3. The [Publish workflow](.github/workflows/publish.yml) automatically runs lint, tests, and publishes the new version to GitHub Packages
+
+### Local development
+
 Run the main validation steps locally:
 
 ```bash
