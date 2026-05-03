@@ -18,7 +18,7 @@ The library has no opinion on web framework — non-Ktor apps can use `AzureAdCl
 Add the following dependency coordinates to your `build.gradle.kts`:
 
 ```kotlin
-implementation("no.nav.syfo:isyfo-backend-utils:0.0.5")
+implementation("no.nav.syfo:isyfo-backend-utils:<version>")
 ```
 
 Also add the GitHub Packages repository so Gradle knows where to fetch it from:
@@ -54,7 +54,7 @@ In CI, set the `ORG_GRADLE_PROJECT_githubUser` and `ORG_GRADLE_PROJECT_githubPas
 
 ### Releasing a new version
 
-1. Bump `version` in `build.gradle.kts` and update the version in the `README.md` dependency coordinates
+1. Bump `version` in `build.gradle.kts`
 2. Commit and push to `main`
 3. The [Publish workflow](.github/workflows/publish.yml) automatically runs lint, tests, and publishes the new version to GitHub Packages
 
