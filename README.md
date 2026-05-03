@@ -216,5 +216,4 @@ Remember to remove `mavenLocal()` before merging — it should not be in the fin
 ## Notes
 
 - The library depends only on the SLF4J API; consuming applications should provide their own logging backend.
-- The bundled Ktor helpers are convenience APIs. If needed later, the Ktor integration can be split into a separate module.
 
