@@ -2,7 +2,7 @@
 
 Shared Kotlin/JVM utility library for isyfo backend services. Intended to grow with shared backend utilities over time.
 
-The library has no opinion on web framework — non-Ktor apps can use `AzureAdClient` and `VeilederTilgangskontrollClient` directly. The Ktor helpers are opt-in.
+Some helpers are for Ktor apps, while non-Ktor apps can use parts of the library like `AzureAdClient` and `VeilederTilgangskontrollClient`.
 
 ## What it provides
 
@@ -21,7 +21,7 @@ Add the following dependency coordinates to your `build.gradle.kts`:
 implementation("no.nav.syfo:isyfo-backend-utils:<version>")
 ```
 
-Also add the GitHub Packages repository so Gradle knows where to fetch it from:
+Also add the GitHub Packages repository so Gradle knows where to fetch it from, and credentials for read access:
 
 ```kotlin
 repositories {
@@ -35,14 +35,16 @@ repositories {
 }
 ```
 
-Here credentials are resolved from Gradle project properties. You can add the following to `~/.gradle/gradle.properties` to be able to install the package for local development of the consumer app:
+Here the credentials are resolved from Gradle project properties.
+
+In CI, set the `ORG_GRADLE_PROJECT_githubUser` and `ORG_GRADLE_PROJECT_githubPassword` environment variables — Gradle automatically maps these to the `githubUser` and `githubPassword` project properties. The `navikt/isworkflows` `kotlin-build-deploy.yml` workflow already sets those environment variables.
+
+For local development and testing, add the following to `~/.gradle/gradle.properties` so the package can be installed when running Gradle tasks for the consumer app locally:
 
 ```properties
 githubUser=<your-github-username>
 githubPassword=<your-github-pat-with-read:packages-scope>
 ```
-
-In CI, set the `ORG_GRADLE_PROJECT_githubUser` and `ORG_GRADLE_PROJECT_githubPassword` environment variables — Gradle automatically maps these to the `githubUser` and `githubPassword` project properties. The `navikt/isworkflows` `kotlin-build-deploy.yml` workflow already does this.
 
 ### Notes
 
