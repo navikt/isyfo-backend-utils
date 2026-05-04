@@ -1,11 +1,11 @@
 name: Publish
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   publish:
+    if: github.ref == 'refs/heads/main'
     name: Build, test and publish to GitHub Packages
     runs-on: ubuntu-latest
     permissions:
@@ -13,6 +13,8 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main
       - uses: actions/setup-java@v5
         with:
           distribution: zulu
@@ -27,4 +29,3 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_githubUser: x-access-token
           ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
-

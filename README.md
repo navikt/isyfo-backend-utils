@@ -57,8 +57,9 @@ githubPassword=<your-github-pat-with-read:packages-scope>
 ### Releasing a new version
 
 1. Bump `version` in `build.gradle.kts`
-2. Commit and push to `main`
-3. The [Publish workflow](.github/workflows/publish.yml) automatically runs lint, tests, and publishes the new version to GitHub Packages
+2. Update changelog.
+3. Merge PR with the changes to `main`.
+4444rigger the [Publish workflow](.github/workflows/publish.yml) manually from the GitHub Actions UI (`Run workflow`)
 
 ### Local development
 
@@ -84,9 +85,14 @@ In the consumer's `build.gradle.kts`, add `mavenLocal()` **first** in the reposi
 ```kotlin
 repositories {
     mavenLocal()  // picks up locally published version
-    maven { url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils") ... }
+    maven {
+        url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils")
+        credentials {
+            username = project.findProperty("githubUser") as String?
+            password = project.findProperty("githubPassword") as String?
+        }
+    }
 }
-
 ```
 
 Remember to remove `mavenLocal()` before merging — it should not be in the final build configuration.
