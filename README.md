@@ -1,4 +1,4 @@
-# isyfo-backend-utils
+# isyfo-backend-common
 
 Shared Kotlin/JVM utility library for isyfo backend services. Intended to grow with shared backend utilities over time.
 
@@ -18,7 +18,7 @@ Some helpers are for Ktor apps, while non-Ktor apps can use parts of the library
 Add the following dependency coordinates to your `build.gradle.kts`:
 
 ```kotlin
-implementation("no.nav.syfo:isyfo-backend-utils:<version>")
+implementation("no.nav.syfo:isyfo-backend-common:<version>")
 ```
 
 Also add the GitHub Packages repository so Gradle knows where to fetch it from, and credentials for read access:
@@ -26,7 +26,7 @@ Also add the GitHub Packages repository so Gradle knows where to fetch it from, 
 ```kotlin
 repositories {
     maven {
-        url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils")
+        url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-common")
         credentials {
             username = project.findProperty("githubUser") as String?
             password = project.findProperty("githubPassword") as String?
@@ -86,7 +86,7 @@ In the consumer's `build.gradle.kts`, add `mavenLocal()` **first** in the reposi
 repositories {
     mavenLocal()  // picks up locally published version
     maven {
-        url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils")
+        url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-common")
         credentials {
             username = project.findProperty("githubUser") as String?
             password = project.findProperty("githubPassword") as String?

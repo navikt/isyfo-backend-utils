@@ -1,1 +1,1 @@
-rootProject.name = "isyfo-backend-utils"
+rootProject.name = "isyfo-backend-common"

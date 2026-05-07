@@ -1,7 +1,7 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType
 
 group = "no.nav.syfo"
-version = "0.0.5"
+version = "0.0.6"
 description = "Shared Kotlin library for checking veileder access via istilgangskontroll"
 
 val jacksonDataTypeVersion = "2.21.2"
@@ -78,25 +78,25 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             groupId = "no.nav.syfo"
-            artifactId = "isyfo-backend-utils"
+            artifactId = "isyfo-backend-common"
             version = project.version.toString()
             from(components["java"])
 
             pom {
-                name.set("isyfo-backend-utils")
+                name.set("isyfo-backend-common")
                 description.set(project.description)
-                url.set("https://github.com/navikt/isyfo-backend-utils")
+                url.set("https://github.com/navikt/isyfo-backend-common")
                 scm {
-                    url.set("https://github.com/navikt/isyfo-backend-utils")
-                    connection.set("scm:git:https://github.com/navikt/isyfo-backend-utils.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/navikt/isyfo-backend-utils.git")
+                    url.set("https://github.com/navikt/isyfo-backend-common")
+                    connection.set("scm:git:https://github.com/navikt/isyfo-backend-common.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/navikt/isyfo-backend-common.git")
                 }
             }
         }
     }
     repositories {
         maven {
-            url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-utils")
+            url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-common")
             credentials {
                 username = System.getenv("ORG_GRADLE_PROJECT_githubUser")
                 password = System.getenv("ORG_GRADLE_PROJECT_githubPassword")
