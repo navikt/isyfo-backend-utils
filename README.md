@@ -15,36 +15,29 @@ Some helpers are for Ktor apps, while non-Ktor apps can use parts of the library
 
 ## Adding the dependency in consumer apps
 
-Add the following dependency coordinates to your `build.gradle.kts`:
+In the consumer app, add the following dependency coordinates to `build.gradle.kts`:
 
 ```kotlin
 implementation("no.nav.syfo:isyfo-backend-common:<version>")
 ```
 
-Also add the GitHub Packages repository so Gradle knows where to fetch it from, and credentials for read access:
+Also add the GitHub Packages repository so Gradle knows where to fetch it from, and provide credentials for reading packages from GitHub, for example:
 
 ```kotlin
 repositories {
     maven {
         url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-common")
         credentials {
-            username = project.findProperty("githubUser") as String?
-            password = project.findProperty("githubPassword") as String?
+            username = project.findProperty("githubUser") as String? ?: "x-access-token"
+            password = project.findProperty("githubPassword") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
 }
 ```
 
-Here the credentials are resolved from Gradle project properties.
+In CI, the `kotlin-build-deploy` workflow from `isworkflows` sets the environment variables `ORG_GRADLE_PROJECT_githubUser` and `ORG_GRADLE_PROJECT_githubPassword`, which makes Gradle set the corresponding Gradle project properties referenced above. In CI workflows the `GITHUB_TOKEN` is also automatically provided by GitHub Actions.
 
-In CI, set the `ORG_GRADLE_PROJECT_githubUser` and `ORG_GRADLE_PROJECT_githubPassword` environment variables — Gradle automatically maps these to the `githubUser` and `githubPassword` project properties. The `navikt/isworkflows` `kotlin-build-deploy.yml` workflow already sets those environment variables.
-
-For local development and testing, add the following to `~/.gradle/gradle.properties` so the package can be installed when running Gradle tasks for the consumer app locally:
-
-```properties
-githubUser=<your-github-username>
-githubPassword=<your-github-pat-with-read:packages-scope>
-```
+Locally, you can set the env var `GITHUB_TOKEN` (or `ORG_GRADLE_PROJECT_githubPassord`) to a GitHub personal access token with the `read:packages` scope. (You can use the same that you use with `NPM_AUTH_TOKEN` in frontend projects.) This will allow you to run Gradle tasks that need to fetch the library in consuming apps.
 
 ### Notes
 
@@ -88,8 +81,8 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/navikt/isyfo-backend-common")
         credentials {
-            username = project.findProperty("githubUser") as String?
-            password = project.findProperty("githubPassword") as String?
+            username = project.findProperty("githubUser") as String? ?: "x-access-token"
+            password = project.findProperty("githubPassword") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
 }
