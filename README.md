@@ -59,7 +59,7 @@ githubPassword=<your-github-pat-with-read:packages-scope>
 1. Bump `version` in `build.gradle.kts`
 2. Update changelog.
 3. Merge PR with the changes to `main`.
-4444rigger the [Publish workflow](.github/workflows/publish.yml) manually from the GitHub Actions UI (`Run workflow`)
+4. Trigger the [Publish workflow](.github/workflows/publish.yml) manually from the GitHub Actions UI (`Run workflow`)
 
 ### Local development
 
