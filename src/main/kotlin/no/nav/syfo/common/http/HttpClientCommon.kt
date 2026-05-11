@@ -9,13 +9,13 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.jackson.jackson
-import no.nav.syfo.common.util.configure
+import no.nav.syfo.common.util.applyCommonJacksonConfig
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner
 import java.net.ProxySelector
 
 internal val commonConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
     install(ContentNegotiation) {
-        jackson { configure() }
+        jackson { applyCommonJacksonConfig() }
     }
     install(HttpRequestRetry) {
         retryOnExceptionIf(2) { _, cause ->
