@@ -24,9 +24,9 @@ import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.common.util.bearerHeader
 import org.slf4j.LoggerFactory
 
-class VeilederTilgangskontrollClient(
+class TilgangskontrollClient(
     private val azureAdClient: AzureAdClient,
-    private val config: VeilederTilgangConfig,
+    private val config: TilgangskontrollClientConfig,
     private val httpClient: HttpClient = httpClientDefault(),
     meterRegistry: MeterRegistry = Metrics.globalRegistry
 ) {
@@ -68,6 +68,17 @@ class VeilederTilgangskontrollClient(
             }
             null
         }
+    }
+
+    private fun handleUnexpectedResponseException(
+        response: HttpResponse,
+        callId: String
+    ) {
+        log.error(
+            "Error while requesting access to person from istilgangskontroll: statusCode={}, callId={}",
+            response.status.value,
+            callId
+        )
     }
 
     suspend fun hasAccess(callId: String, personident: String, token: String): Boolean {
@@ -114,19 +125,8 @@ class VeilederTilgangskontrollClient(
         }
     }
 
-    private fun handleUnexpectedResponseException(
-        response: HttpResponse,
-        callId: String
-    ) {
-        log.error(
-            "Error while requesting access to person from istilgangskontroll: statusCode={}, callId={}",
-            response.status.value,
-            callId
-        )
-    }
-
     companion object {
-        private val log = LoggerFactory.getLogger(VeilederTilgangskontrollClient::class.java)
+        private val log = LoggerFactory.getLogger(TilgangskontrollClient::class.java)
 
         private const val TILGANGSKONTROLL_PERSON_PATH = "/api/tilgang/navident/person"
         private const val TILGANGSKONTROLL_BRUKERE_PATH = "/api/tilgang/navident/brukere"

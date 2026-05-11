@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT
 import io.ktor.http.HttpHeaders
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.routing.RoutingContext
-import no.nav.syfo.common.tilgangskontroll.client.VeilederTilgangskontrollClient
+import no.nav.syfo.common.tilgangskontroll.client.TilgangskontrollClient
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
 
@@ -31,7 +31,7 @@ fun ApplicationCall.getBearerHeader(): String? =
 
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
-    veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
+    veilederTilgangskontrollClient: TilgangskontrollClient,
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
 ) {
@@ -50,7 +50,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
     personident: String,
-    veilederTilgangskontrollClient: VeilederTilgangskontrollClient,
+    veilederTilgangskontrollClient: TilgangskontrollClient,
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
 ) {

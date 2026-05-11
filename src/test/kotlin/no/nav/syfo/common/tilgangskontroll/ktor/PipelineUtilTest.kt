@@ -10,7 +10,7 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.common.tilgangskontroll.client.VeilederTilgangskontrollClient
+import no.nav.syfo.common.tilgangskontroll.client.TilgangskontrollClient
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.common.util.bearerHeader
@@ -25,7 +25,7 @@ class PipelineUtilTest {
     private val personident = "12345678910"
     private val token = "token"
 
-    private val veilederTilgangskontrollClient = mockk<VeilederTilgangskontrollClient>()
+    private val veilederTilgangskontrollClient = mockk<TilgangskontrollClient>()
 
     @Test
     fun `calls hasAccess and executes block when read access is granted`() {

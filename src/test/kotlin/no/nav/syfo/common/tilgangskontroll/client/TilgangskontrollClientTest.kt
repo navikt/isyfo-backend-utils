@@ -28,14 +28,14 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 /**
- * Unit test for VeilederTilgangskontrollClient. azureAdClient and httpClient dependencies are mocked.
+ * Unit test for TilgangskontrollClient. azureAdClient and httpClient dependencies are mocked.
  */
-class VeilederTilgangskontrollClientTest {
+class TilgangskontrollClientTest {
     private val token = "token"
     private val oboToken = "obo-token"
     private val callId = "call-id"
     private val personident = "12345678910"
-    private val config = VeilederTilgangConfig(
+    private val config = TilgangskontrollClientConfig(
         baseUrl = "isTilgangskontrollUrl",
         clientId = "dev-fss.teamsykefravr.istilgangskontroll"
     )
@@ -63,7 +63,7 @@ class VeilederTilgangskontrollClientTest {
         lateinit var callIdHeader: String
 
         // In order to intercept the headers that istilgangskontroll would be called with, this test
-        // sets up httpClient and VeilederTilgangskontrollClient manually instead of using createMockClientForResponse().
+        // sets up httpClient and TilgangskontrollClient manually instead of using createMockClientForResponse().
         val httpClient = HttpClient(MockEngine) {
             commonConfig()
             engine {
@@ -76,7 +76,7 @@ class VeilederTilgangskontrollClientTest {
             }
         }
 
-        val client = VeilederTilgangskontrollClient(
+        val client = TilgangskontrollClient(
             azureAdClient = azureAdClient,
             config = config,
             httpClient = httpClient
@@ -170,7 +170,7 @@ class VeilederTilgangskontrollClientTest {
             }
         }
 
-        val client = VeilederTilgangskontrollClient(
+        val client = TilgangskontrollClient(
             azureAdClient = azureAdClient,
             config = config,
             httpClient = httpClient
@@ -208,7 +208,7 @@ class VeilederTilgangskontrollClientTest {
     private fun createMockClientForResponse(
         tilgang: Tilgang = Tilgang(erGodkjent = true),
         status: HttpStatusCode = HttpStatusCode.OK
-    ): VeilederTilgangskontrollClient {
+    ): TilgangskontrollClient {
         val httpClient = HttpClient(MockEngine) {
             commonConfig()
             engine {
@@ -222,7 +222,7 @@ class VeilederTilgangskontrollClientTest {
             }
         }
 
-        return VeilederTilgangskontrollClient(
+        return TilgangskontrollClient(
             azureAdClient = azureAdClient,
             config = config,
             httpClient = httpClient

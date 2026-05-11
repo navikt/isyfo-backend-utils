@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 /**
- * Unit test for the batch access endpoint in VeilederTilgangskontrollClient.
+ * Unit test for the batch access endpoint in TilgangskontrollClient.
  * Tests the veilederPersonerAccess() method with various scenarios including
  * successful responses, access denied, server errors, and empty lists.
  */
@@ -30,7 +30,7 @@ class VeilederPersonerAccessTest {
     private val oboToken = "obo-token"
     private val callId = "call-id"
     private val personidenter = listOf("12345678910", "10987654321", "11223344556")
-    private val config = VeilederTilgangConfig(
+    private val config = TilgangskontrollClientConfig(
         baseUrl = "isTilgangskontrollUrl",
         clientId = "dev-fss.teamsykefravr.istilgangskontroll"
     )
@@ -201,7 +201,7 @@ class VeilederPersonerAccessTest {
     private fun createMockClientForBatchResponse(
         response: List<String>?,
         status: HttpStatusCode
-    ): VeilederTilgangskontrollClient {
+    ): TilgangskontrollClient {
         val httpClient = HttpClient(MockEngine) {
             commonConfig()
             engine {
@@ -215,7 +215,7 @@ class VeilederPersonerAccessTest {
             }
         }
 
-        return VeilederTilgangskontrollClient(
+        return TilgangskontrollClient(
             azureAdClient = azureAdClient,
             config = config,
             httpClient = httpClient
