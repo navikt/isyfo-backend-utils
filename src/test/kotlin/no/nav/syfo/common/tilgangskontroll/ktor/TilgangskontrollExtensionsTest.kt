@@ -109,7 +109,7 @@ class TilgangskontrollExtensionsTest {
             tilgangskontrollClient.hasAccess(callId, personident, token)
         } returns false
 
-        assertThrows(ForbiddenAccessVeilederException::class.java) {
+        assertThrows(VeilederTilgangBlokkertException::class.java) {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,
@@ -253,7 +253,7 @@ class TilgangskontrollExtensionsTest {
             tilgangskontrollClient.hasAccess(callId, personident, token)
         } returns false
 
-        assertThrows(ForbiddenAccessVeilederException::class.java) {
+        assertThrows(VeilederTilgangBlokkertException::class.java) {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,

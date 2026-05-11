@@ -51,7 +51,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
     }
 
     if (!hasAccess) {
-        throw ForbiddenAccessVeilederException(action = action)
+        throw VeilederTilgangBlokkertException(action = action)
     } else {
         block()
     }
