@@ -19,13 +19,13 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class PipelineUtilTest {
+class TilgangskontrollExtensionsTest {
     private val action = "read aktivitetskrav"
     private val callId = "123"
     private val personident = "12345678910"
     private val token = "token"
 
-    private val veilederTilgangskontrollClient = mockk<TilgangskontrollClient>()
+    private val tilgangskontrollClient = mockk<TilgangskontrollClient>()
 
     @Test
     fun `calls hasAccess and executes block when read access is granted`() {
@@ -39,13 +39,13 @@ class PipelineUtilTest {
         var blockCalled = false
 
         coEvery {
-            veilederTilgangskontrollClient.hasAccess(callId, personident, token)
+            tilgangskontrollClient.hasAccess(callId, personident, token)
         } returns true
 
         runBlocking {
             routingContext.checkVeilederTilgang(
                 action = action,
-                veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                tilgangskontrollClient = tilgangskontrollClient
             ) {
                 blockCalled = true
             }
@@ -53,10 +53,10 @@ class PipelineUtilTest {
 
         assertTrue(blockCalled)
         coVerify(exactly = 1) {
-            veilederTilgangskontrollClient.hasAccess(callId, personident, token)
+            tilgangskontrollClient.hasAccess(callId, personident, token)
         }
         coVerify(exactly = 0) {
-            veilederTilgangskontrollClient.hasWriteAccess(any(), any(), any())
+            tilgangskontrollClient.hasWriteAccess(any(), any(), any())
         }
     }
 
@@ -72,13 +72,13 @@ class PipelineUtilTest {
         var blockCalled = false
 
         coEvery {
-            veilederTilgangskontrollClient.hasWriteAccess(callId, personident, token)
+            tilgangskontrollClient.hasWriteAccess(callId, personident, token)
         } returns true
 
         runBlocking {
             routingContext.checkVeilederTilgang(
                 action = action,
-                veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                tilgangskontrollClient = tilgangskontrollClient,
                 requiresWriteAccess = true
             ) {
                 blockCalled = true
@@ -87,10 +87,10 @@ class PipelineUtilTest {
 
         assertTrue(blockCalled)
         coVerify(exactly = 1) {
-            veilederTilgangskontrollClient.hasWriteAccess(callId, personident, token)
+            tilgangskontrollClient.hasWriteAccess(callId, personident, token)
         }
         coVerify(exactly = 0) {
-            veilederTilgangskontrollClient.hasAccess(any(), any(), any())
+            tilgangskontrollClient.hasAccess(any(), any(), any())
         }
     }
 
@@ -106,14 +106,14 @@ class PipelineUtilTest {
         var blockCalled = false
 
         coEvery {
-            veilederTilgangskontrollClient.hasAccess(callId, personident, token)
+            tilgangskontrollClient.hasAccess(callId, personident, token)
         } returns false
 
         assertThrows(ForbiddenAccessVeilederException::class.java) {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                    tilgangskontrollClient = tilgangskontrollClient
                 ) {
                     blockCalled = true
                 }
@@ -122,7 +122,7 @@ class PipelineUtilTest {
 
         assertFalse(blockCalled)
         coVerify(exactly = 1) {
-            veilederTilgangskontrollClient.hasAccess(callId, personident, token)
+            tilgangskontrollClient.hasAccess(callId, personident, token)
         }
     }
 
@@ -139,16 +139,16 @@ class PipelineUtilTest {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                    tilgangskontrollClient = tilgangskontrollClient
                 ) {}
             }
         }
 
         coVerify(exactly = 0) {
-            veilederTilgangskontrollClient.hasAccess(any(), any(), any())
+            tilgangskontrollClient.hasAccess(any(), any(), any())
         }
         coVerify(exactly = 0) {
-            veilederTilgangskontrollClient.hasWriteAccess(any(), any(), any())
+            tilgangskontrollClient.hasWriteAccess(any(), any(), any())
         }
     }
 
@@ -165,16 +165,16 @@ class PipelineUtilTest {
             runBlocking {
                 routingContext.checkVeilederTilgang(
                     action = action,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                    tilgangskontrollClient = tilgangskontrollClient
                 ) {}
             }
         }
 
         coVerify(exactly = 0) {
-            veilederTilgangskontrollClient.hasAccess(any(), any(), any())
+            tilgangskontrollClient.hasAccess(any(), any(), any())
         }
         coVerify(exactly = 0) {
-            veilederTilgangskontrollClient.hasWriteAccess(any(), any(), any())
+            tilgangskontrollClient.hasWriteAccess(any(), any(), any())
         }
     }
 
@@ -189,14 +189,14 @@ class PipelineUtilTest {
         var blockCalled = false
 
         coEvery {
-            veilederTilgangskontrollClient.hasAccess(callId, personident, token)
+            tilgangskontrollClient.hasAccess(callId, personident, token)
         } returns true
 
         runBlocking {
             routingContext.checkVeilederTilgang(
                 action = action,
                 personident = personident,
-                veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                tilgangskontrollClient = tilgangskontrollClient
             ) {
                 blockCalled = true
             }
@@ -204,7 +204,7 @@ class PipelineUtilTest {
 
         assertTrue(blockCalled)
         coVerify(exactly = 1) {
-            veilederTilgangskontrollClient.hasAccess(callId, personident, token)
+            tilgangskontrollClient.hasAccess(callId, personident, token)
         }
     }
 
@@ -219,14 +219,14 @@ class PipelineUtilTest {
         var blockCalled = false
 
         coEvery {
-            veilederTilgangskontrollClient.hasWriteAccess(callId, personident, token)
+            tilgangskontrollClient.hasWriteAccess(callId, personident, token)
         } returns true
 
         runBlocking {
             routingContext.checkVeilederTilgang(
                 action = action,
                 personident = personident,
-                veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+                tilgangskontrollClient = tilgangskontrollClient,
                 requiresWriteAccess = true
             ) {
                 blockCalled = true
@@ -235,7 +235,7 @@ class PipelineUtilTest {
 
         assertTrue(blockCalled)
         coVerify(exactly = 1) {
-            veilederTilgangskontrollClient.hasWriteAccess(callId, personident, token)
+            tilgangskontrollClient.hasWriteAccess(callId, personident, token)
         }
     }
 
@@ -250,7 +250,7 @@ class PipelineUtilTest {
         var blockCalled = false
 
         coEvery {
-            veilederTilgangskontrollClient.hasAccess(callId, personident, token)
+            tilgangskontrollClient.hasAccess(callId, personident, token)
         } returns false
 
         assertThrows(ForbiddenAccessVeilederException::class.java) {
@@ -258,7 +258,7 @@ class PipelineUtilTest {
                 routingContext.checkVeilederTilgang(
                     action = action,
                     personident = personident,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                    tilgangskontrollClient = tilgangskontrollClient
                 ) {
                     blockCalled = true
                 }
@@ -281,13 +281,13 @@ class PipelineUtilTest {
                 routingContext.checkVeilederTilgang(
                     action = action,
                     personident = personident,
-                    veilederTilgangskontrollClient = veilederTilgangskontrollClient
+                    tilgangskontrollClient = tilgangskontrollClient
                 ) {}
             }
         }
 
         coVerify(exactly = 0) {
-            veilederTilgangskontrollClient.hasAccess(any(), any(), any())
+            tilgangskontrollClient.hasAccess(any(), any(), any())
         }
     }
 

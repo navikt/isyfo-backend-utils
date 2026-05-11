@@ -9,7 +9,7 @@ import no.nav.syfo.common.util.ktor.getPersonident
 
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
-    veilederTilgangskontrollClient: TilgangskontrollClient,
+    tilgangskontrollClient: TilgangskontrollClient,
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
 ) {
@@ -19,7 +19,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
     checkVeilederTilgang(
         action = action,
         personident = personident,
-        veilederTilgangskontrollClient = veilederTilgangskontrollClient,
+        tilgangskontrollClient = tilgangskontrollClient,
         requiresWriteAccess = requiresWriteAccess,
         block = block
     )
@@ -28,7 +28,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
     personident: String,
-    veilederTilgangskontrollClient: TilgangskontrollClient,
+    tilgangskontrollClient: TilgangskontrollClient,
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
 ) {
@@ -37,13 +37,13 @@ suspend fun RoutingContext.checkVeilederTilgang(
         ?: throw IllegalArgumentException("Failed to complete the following action: $action. No Authorization header supplied")
 
     val hasAccess = if (requiresWriteAccess) {
-        veilederTilgangskontrollClient.hasWriteAccess(
+        tilgangskontrollClient.hasWriteAccess(
             callId = callId,
             personident = personident,
             token = token
         )
     } else {
-        veilederTilgangskontrollClient.hasAccess(
+        tilgangskontrollClient.hasAccess(
             callId = callId,
             personident = personident,
             token = token
