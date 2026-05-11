@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgangskontroll.client
+package no.nav.syfo.common.tilgangskontroll.client
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -17,11 +17,11 @@ import io.ktor.http.HttpStatusCode
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
-import no.nav.syfo.azure.AzureAdClient
-import no.nav.syfo.http.httpClientDefault
-import no.nav.syfo.util.NAV_CALL_ID_HEADER
-import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
-import no.nav.syfo.util.bearerHeader
+import no.nav.syfo.common.azure.AzureAdClient
+import no.nav.syfo.common.http.httpClientDefault
+import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
+import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
+import no.nav.syfo.common.util.bearerHeader
 import org.slf4j.LoggerFactory
 
 class VeilederTilgangskontrollClient(

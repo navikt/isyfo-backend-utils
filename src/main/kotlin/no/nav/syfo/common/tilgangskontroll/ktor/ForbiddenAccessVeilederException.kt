@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgangskontroll.ktor
+package no.nav.syfo.common.tilgangskontroll.ktor
 
 class ForbiddenAccessVeilederException(
     action: String,

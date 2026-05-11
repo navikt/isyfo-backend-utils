@@ -1,4 +1,4 @@
-package no.nav.syfo.tilgangskontroll.client
+package no.nav.syfo.common.tilgangskontroll.client
 
 internal data class Tilgang(
     val erGodkjent: Boolean,

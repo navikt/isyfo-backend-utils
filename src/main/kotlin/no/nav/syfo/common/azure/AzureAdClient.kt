@@ -1,4 +1,4 @@
-package no.nav.syfo.azure
+package no.nav.syfo.common.azure
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -10,7 +10,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.Parameters
-import no.nav.syfo.http.httpClientProxy
+import no.nav.syfo.common.http.httpClientProxy
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
