@@ -17,7 +17,7 @@ import io.ktor.http.HttpStatusCode
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
-import no.nav.syfo.common.azure.AzureAdClient
+import no.nav.syfo.common.azure.OboTokenProvider
 import no.nav.syfo.common.http.httpClientDefault
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
@@ -25,7 +25,7 @@ import no.nav.syfo.common.util.bearerHeader
 import org.slf4j.LoggerFactory
 
 class TilgangskontrollClient(
-    private val azureAdClient: AzureAdClient,
+    private val oboTokenProvider: OboTokenProvider,
     private val config: TilgangskontrollClientConfig,
     private val httpClient: HttpClient = httpClientDefault(),
     meterRegistry: MeterRegistry = Metrics.globalRegistry
@@ -44,11 +44,10 @@ class TilgangskontrollClient(
         .register(meterRegistry)
 
     private suspend fun getTilgang(callId: String, personident: String, token: String): Tilgang? {
-        val onBehalfOfToken = azureAdClient.getOnBehalfOfToken(
+        val onBehalfOfToken = oboTokenProvider.getOnBehalfOfToken(
             scopeClientId = config.clientId,
             token = token
-        )?.accessToken
-            ?: throw RuntimeException("Failed to request access to Person: Failed to get OBO token")
+        ) ?: throw RuntimeException("Failed to request access to Person: Failed to get OBO token")
 
         return try {
             val tilgangResponse = httpClient.get(tilgangskontrollPersonUrl) {
@@ -96,11 +95,10 @@ class TilgangskontrollClient(
         token: String,
         callId: String
     ): List<String>? {
-        val oboToken = azureAdClient.getOnBehalfOfToken(
+        val oboToken = oboTokenProvider.getOnBehalfOfToken(
             scopeClientId = config.clientId,
             token = token
-        )?.accessToken
-            ?: throw RuntimeException("Failed to request access to list of persons: Failed to get OBO token")
+        ) ?: throw RuntimeException("Failed to request access to list of persons: Failed to get OBO token")
 
         return try {
             val response: HttpResponse = httpClient.post(tilgangskontrollBrukereUrl) {

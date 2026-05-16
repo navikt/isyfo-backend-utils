@@ -17,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap
 class AzureAdClient(
     private val azureEnvironment: AzureEnvironment,
     private val httpClient: HttpClient = httpClientProxy()
-) {
-    suspend fun getOnBehalfOfToken(scopeClientId: String, token: String): AzureAdToken? = getAccessToken(
+) : OboTokenProvider {
+    override suspend fun getOnBehalfOfToken(scopeClientId: String, token: String): String? = getAccessToken(
         Parameters.build {
             append("client_id", azureEnvironment.appClientId)
             append("client_secret", azureEnvironment.appClientSecret)
@@ -28,7 +28,7 @@ class AzureAdClient(
             append("scope", "api://$scopeClientId/.default")
             append("requested_token_use", "on_behalf_of")
         }
-    )?.toAzureAdToken()
+    )?.toAzureAdToken()?.accessToken
 
     suspend fun getSystemToken(scopeClientId: String): AzureAdToken? {
         val cacheKey = "${CACHE_AZUREAD_TOKEN_SYSTEM_KEY_PREFIX}$scopeClientId"

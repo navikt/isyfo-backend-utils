@@ -9,8 +9,8 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.common.azure.AzureAdClient
-import no.nav.syfo.common.azure.AzureAdToken
+import no.nav.syfo.common.azure.OboTokenProvider
+
 import no.nav.syfo.common.http.commonConfig
 import no.nav.syfo.common.testhelper.receiveBody
 import no.nav.syfo.common.testhelper.respond
@@ -25,8 +25,6 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
-
 /**
  * Unit test for TilgangskontrollClient. azureAdClient and httpClient dependencies are mocked.
  */
@@ -39,16 +37,13 @@ class TilgangskontrollClientTest {
         baseUrl = "isTilgangskontrollUrl",
         clientId = "dev-fss.teamsykefravr.istilgangskontroll"
     )
-    private val azureAdClient = mockk<AzureAdClient>()
+    private val oboTokenProvider = mockk<OboTokenProvider>()
 
     @BeforeEach
     fun setup() {
         coEvery {
-            azureAdClient.getOnBehalfOfToken(any(), any())
-        } returns AzureAdToken(
-            accessToken = oboToken,
-            expires = LocalDateTime.now().plusHours(1)
-        )
+            oboTokenProvider.getOnBehalfOfToken(any(), any())
+        } returns oboToken
     }
 
     @AfterEach
@@ -77,7 +72,7 @@ class TilgangskontrollClientTest {
         }
 
         val client = TilgangskontrollClient(
-            azureAdClient = azureAdClient,
+            oboTokenProvider = oboTokenProvider,
             config = config,
             httpClient = httpClient
         )
@@ -134,7 +129,7 @@ class TilgangskontrollClientTest {
     @Test
     fun `hasAccess and hasWriteAccess throws when obo token request fails`() {
         coEvery {
-            azureAdClient.getOnBehalfOfToken(any(), any())
+            oboTokenProvider.getOnBehalfOfToken(any(), any())
         } returns null
 
         val client = createMockClientForResponse()
@@ -171,7 +166,7 @@ class TilgangskontrollClientTest {
         }
 
         val client = TilgangskontrollClient(
-            azureAdClient = azureAdClient,
+            oboTokenProvider = oboTokenProvider,
             config = config,
             httpClient = httpClient
         )
@@ -223,7 +218,7 @@ class TilgangskontrollClientTest {
         }
 
         return TilgangskontrollClient(
-            azureAdClient = azureAdClient,
+            oboTokenProvider = oboTokenProvider,
             config = config,
             httpClient = httpClient
         )
