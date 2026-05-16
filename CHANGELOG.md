@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.0.13]
+
+### Changed
+- Renamed `ApplicationCall.getNAVIdent()` to `getNavIdent()` for consistent camelCase naming.
+- Renamed `ApplicationCall.getBearerHeader()` to `getBearerToken()` to better reflect what it returns (the token string, not a header).
+- Renamed `ApplicationCall.getPersonident()` to `getPersonIdent()` for consistent camelCase naming.
+
 ## [0.0.12]
 
 ### Added

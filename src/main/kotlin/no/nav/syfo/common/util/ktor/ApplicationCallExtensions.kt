@@ -11,18 +11,18 @@ internal const val JWT_CLAIM_NAVIDENT = "NAVident"
 
 fun ApplicationCall.getCallId(): String = this.request.headers[NAV_CALL_ID_HEADER].toString()
 
-fun ApplicationCall.getPersonident(): String? = this.request.headers[NAV_PERSONIDENT_HEADER]
+fun ApplicationCall.getPersonIdent(): String? = this.request.headers[NAV_PERSONIDENT_HEADER]
 
 fun ApplicationCall.getConsumerClientId(): String? =
-    getBearerHeader()?.let {
+    getBearerToken()?.let {
         JWT.decode(it).claims[JWT_CLAIM_AZP]?.asString()
     }
 
-fun ApplicationCall.getNAVIdent(): String {
-    val token = getBearerHeader() ?: throw Error("No Authorization header supplied")
+fun ApplicationCall.getNavIdent(): String {
+    val token = getBearerToken() ?: throw Error("No Authorization header supplied")
     return JWT.decode(token).claims[JWT_CLAIM_NAVIDENT]?.asString()
         ?: throw Error("Missing NAVident in private claims")
 }
 
-fun ApplicationCall.getBearerHeader(): String? =
+fun ApplicationCall.getBearerToken(): String? =
     this.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")

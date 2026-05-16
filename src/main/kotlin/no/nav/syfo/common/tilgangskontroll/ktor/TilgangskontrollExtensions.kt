@@ -3,9 +3,9 @@ package no.nav.syfo.common.tilgangskontroll.ktor
 import io.ktor.server.routing.RoutingContext
 import no.nav.syfo.common.tilgangskontroll.client.TilgangskontrollClient
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
-import no.nav.syfo.common.util.ktor.getBearerHeader
+import no.nav.syfo.common.util.ktor.getBearerToken
 import no.nav.syfo.common.util.ktor.getCallId
-import no.nav.syfo.common.util.ktor.getPersonident
+import no.nav.syfo.common.util.ktor.getPersonIdent
 
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
@@ -13,7 +13,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
 ) {
-    val personident = call.getPersonident()
+    val personident = call.getPersonIdent()
         ?: throw IllegalArgumentException("Failed to $action: No $NAV_PERSONIDENT_HEADER supplied in request header")
 
     checkVeilederTilgang(
@@ -33,7 +33,7 @@ suspend fun RoutingContext.checkVeilederTilgang(
     block: suspend () -> Unit
 ) {
     val callId = call.getCallId()
-    val token = call.getBearerHeader()
+    val token = call.getBearerToken()
         ?: throw IllegalArgumentException("Failed to complete the following action: $action. No Authorization header supplied")
 
     val hasAccess = if (requiresWriteAccess) {
