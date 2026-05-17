@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.0.15]
+
+### Changed
+- Added KDoc to all public API members.
+- Renamed `veilederPersonerAccess()` to `personsVeilederHasAccessTo()`.
+- Renamed parameter `personident` to `personIdent` in `hasAccess()` and `hasWriteAccess()`.
+- Renamed parameter `personidenter` to `personIdenter` in `personsVeilederHasAccessTo()`.
+
 ## [0.0.14]
 
 ### Changed

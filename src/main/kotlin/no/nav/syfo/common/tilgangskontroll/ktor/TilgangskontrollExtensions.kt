@@ -11,7 +11,7 @@ import no.nav.syfo.common.util.ktor.getPersonIdent
  * Reads the `Nav-Personident` header from the request, checks access via [tilgangskontrollClient],
  * and executes [block] if access is granted. Throws [VeilederTilgangForbiddenException] if denied.
  *
- * This overload reads the personident from the `Nav-Personident` request header automatically.
+ * This overload reads the personIdent from the `Nav-Personident` request header automatically.
  *
  * @param action Short description of the action being performed, used in error messages.
  * @param tilgangskontrollClient Client used to check access.
@@ -24,12 +24,12 @@ suspend fun RoutingContext.checkVeilederTilgang(
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
 ) {
-    val personident = call.getPersonIdent()
+    val personIdent = call.getPersonIdent()
         ?: throw IllegalArgumentException("Failed to $action: No $NAV_PERSONIDENT_HEADER supplied in request header")
 
     checkVeilederTilgang(
         action = action,
-        personident = personident,
+        personIdent = personIdent,
         tilgangskontrollClient = tilgangskontrollClient,
         requiresWriteAccess = requiresWriteAccess,
         block = block
@@ -37,20 +37,20 @@ suspend fun RoutingContext.checkVeilederTilgang(
 }
 
 /**
- * Checks veileder access for an explicitly provided [personident], then executes [block] if granted.
+ * Checks veileder access for an explicitly provided [personIdent], then executes [block] if granted.
  * Throws [VeilederTilgangForbiddenException] if denied.
  *
- * Use this overload when the personident comes from the request body rather than the `Nav-Personident` header.
+ * Use this overload when the personIdent comes from the request body rather than the `Nav-Personident` header.
  *
  * @param action Short description of the action being performed, used in error messages.
- * @param personident The person's national identity number to check access for.
+ * @param personIdent The person's national identity number to check access for.
  * @param tilgangskontrollClient Client used to check access.
  * @param requiresWriteAccess If true, checks for fullTilgang (write access) rather than read access.
  * @param block The handler to execute if access is granted.
  */
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
-    personident: String,
+    personIdent: String,
     tilgangskontrollClient: TilgangskontrollClient,
     requiresWriteAccess: Boolean = false,
     block: suspend () -> Unit
@@ -62,13 +62,13 @@ suspend fun RoutingContext.checkVeilederTilgang(
     val hasAccess = if (requiresWriteAccess) {
         tilgangskontrollClient.hasWriteAccess(
             callId = callId,
-            personident = personident,
+            personIdent = personIdent,
             token = token
         )
     } else {
         tilgangskontrollClient.hasAccess(
             callId = callId,
-            personident = personident,
+            personIdent = personIdent,
             token = token
         )
     }

@@ -31,7 +31,7 @@ class TilgangskontrollClientTest {
     private val token = "token"
     private val oboToken = "obo-token"
     private val callId = "call-id"
-    private val personident = "12345678910"
+    private val personIdent = "12345678910"
     private val config = TilgangskontrollClientConfig(
         baseUrl = "isTilgangskontrollUrl",
         clientId = "dev-fss.teamsykefravr.istilgangskontroll"
@@ -53,7 +53,7 @@ class TilgangskontrollClientTest {
     @Test
     fun `hasAccess returns true when tilgang is approved and sends expected headers to istilgangskontroll`() {
         lateinit var authorizationHeader: String
-        lateinit var personidentHeader: String
+        lateinit var personIdentHeader: String
         lateinit var callIdHeader: String
 
         // In order to intercept the headers that istilgangskontroll would be called with, this test
@@ -63,7 +63,7 @@ class TilgangskontrollClientTest {
             engine {
                 addHandler { request ->
                     authorizationHeader = request.headers[HttpHeaders.Authorization].orEmpty()
-                    personidentHeader = request.headers[NAV_PERSONIDENT_HEADER].orEmpty()
+                    personIdentHeader = request.headers[NAV_PERSONIDENT_HEADER].orEmpty()
                     callIdHeader = request.headers[NAV_CALL_ID_HEADER].orEmpty()
                     respond(Tilgang(erGodkjent = true))
                 }
@@ -77,11 +77,11 @@ class TilgangskontrollClientTest {
         )
 
         runBlocking {
-            assertTrue(client.hasAccess(callId, personident, token))
+            assertTrue(client.hasAccess(callId, personIdent, token))
         }
 
         assertEquals(bearerHeader(oboToken), authorizationHeader)
-        assertEquals(personident, personidentHeader)
+        assertEquals(personIdent, personIdentHeader)
         assertEquals(callId, callIdHeader)
     }
 
@@ -90,8 +90,8 @@ class TilgangskontrollClientTest {
         val client = createMockClientForResponse(Tilgang(erGodkjent = true, fullTilgang = true))
 
         runBlocking {
-            assertTrue(client.hasAccess(callId, personident, token))
-            assertTrue(client.hasWriteAccess(callId, personident, token))
+            assertTrue(client.hasAccess(callId, personIdent, token))
+            assertTrue(client.hasWriteAccess(callId, personIdent, token))
         }
     }
 
@@ -100,8 +100,8 @@ class TilgangskontrollClientTest {
         val client = createMockClientForResponse(Tilgang(erGodkjent = true, fullTilgang = false))
 
         runBlocking {
-            assertTrue(client.hasAccess(callId, personident, token))
-            assertFalse(client.hasWriteAccess(callId, personident, token))
+            assertTrue(client.hasAccess(callId, personIdent, token))
+            assertFalse(client.hasWriteAccess(callId, personIdent, token))
         }
     }
 
@@ -110,8 +110,8 @@ class TilgangskontrollClientTest {
         val client = createMockClientForResponse(Tilgang(erGodkjent = false, fullTilgang = true))
 
         runBlocking {
-            assertFalse(client.hasAccess(callId, personident, token))
-            assertFalse(client.hasWriteAccess(callId, personident, token))
+            assertFalse(client.hasAccess(callId, personIdent, token))
+            assertFalse(client.hasWriteAccess(callId, personIdent, token))
         }
     }
 
@@ -120,8 +120,8 @@ class TilgangskontrollClientTest {
         val client = createMockClientForResponse(status = HttpStatusCode.InternalServerError)
 
         runBlocking {
-            assertFalse(client.hasAccess(callId, personident, token))
-            assertFalse(client.hasWriteAccess(callId, personident, token))
+            assertFalse(client.hasAccess(callId, personIdent, token))
+            assertFalse(client.hasWriteAccess(callId, personIdent, token))
         }
     }
 
@@ -135,19 +135,19 @@ class TilgangskontrollClientTest {
 
         assertThrows(RuntimeException::class.java) {
             runBlocking {
-                client.hasAccess(callId, personident, token)
+                client.hasAccess(callId, personIdent, token)
             }
         }
         assertThrows(RuntimeException::class.java) {
             runBlocking {
-                client.hasWriteAccess(callId, personident, token)
+                client.hasWriteAccess(callId, personIdent, token)
             }
         }
     }
 
     @Test
-    fun `veilederPersonerAccess returns filtered personident list and sends expected payload`() {
-        val requestedPersonidenter = listOf(personident, "10987654321")
+    fun `personsVeilederHasAccessTo returns filtered personIdent list and sends expected payload`() {
+        val requestedPersonidenter = listOf(personIdent, "10987654321")
         lateinit var authorizationHeader: String
         lateinit var callIdHeader: String
         lateinit var requestBody: List<String>
@@ -159,7 +159,7 @@ class TilgangskontrollClientTest {
                     authorizationHeader = request.headers[HttpHeaders.Authorization].orEmpty()
                     callIdHeader = request.headers[NAV_CALL_ID_HEADER].orEmpty()
                     requestBody = request.receiveBody()
-                    respond(listOf(personident))
+                    respond(listOf(personIdent))
                 }
             }
         }
@@ -171,26 +171,26 @@ class TilgangskontrollClientTest {
         )
 
         val tilgang = runBlocking {
-            client.veilederPersonerAccess(
-                personidenter = requestedPersonidenter,
+            client.personsVeilederHasAccessTo(
+                personIdenter = requestedPersonidenter,
                 token = token,
                 callId = callId
             )
         }
 
-        assertEquals(listOf(personident), tilgang)
+        assertEquals(listOf(personIdent), tilgang)
         assertEquals(bearerHeader(oboToken), authorizationHeader)
         assertEquals(callId, callIdHeader)
         assertEquals(requestedPersonidenter, requestBody)
     }
 
     @Test
-    fun `veilederPersonerAccess returns null when istilgangskontroll responds forbidden`() {
+    fun `personsVeilederHasAccessTo returns null when istilgangskontroll responds forbidden`() {
         val client = createMockClientForResponse(status = HttpStatusCode.Forbidden)
 
         val tilgang = runBlocking {
-            client.veilederPersonerAccess(
-                personidenter = listOf(personident),
+            client.personsVeilederHasAccessTo(
+                personIdenter = listOf(personIdent),
                 token = token,
                 callId = callId
             )

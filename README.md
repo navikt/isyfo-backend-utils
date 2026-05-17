@@ -156,13 +156,13 @@ val tilgangskontrollClient = VeilederTilgangskontrollClient(
 ```kotlin
 val hasReadAccess = tilgangskontrollClient.hasAccess(
     callId = "call-id",
-    personident = "12345678910",
+    personIdent = "12345678910",
     token = incomingToken,
 )
 
 val hasWriteAccess = tilgangskontrollClient.hasWriteAccess(
     callId = "call-id",
-    personident = "12345678910",
+    personIdent = "12345678910",
     token = incomingToken,
 )
 ```
@@ -170,8 +170,8 @@ val hasWriteAccess = tilgangskontrollClient.hasWriteAccess(
 ### Option B: Check batch access
 
 ```kotlin
-val accessiblePersonidenter: List<String>? = tilgangskontrollClient.veilederPersonerAccess(
-    personidenter = listOf("12345678910", "10987654321"),
+val accessiblePersonIdenter: List<String>? = tilgangskontrollClient.personsVeilederHasAccessTo(
+    personIdenter = listOf("12345678910", "10987654321"),
     token = incomingToken,
     callId = "call-id",
 )
@@ -181,7 +181,7 @@ val accessiblePersonidenter: List<String>? = tilgangskontrollClient.veilederPers
 
 `checkVeilederTilgang()` wraps a route handler block — it extracts the token, calls the appropriate access check, and responds with `403 Forbidden` if access is denied.
 
-Reading personident from the `nav-personident` request header:
+Reading personIdent from the `nav-personident` request header:
 
 ```kotlin
 route("/api") {
@@ -196,7 +196,7 @@ route("/api") {
 }
 ```
 
-Providing personident explicitly (e.g. when read from the request body):
+Providing personIdent explicitly (e.g. when read from the request body):
 
 ```kotlin
 route("/api") {
@@ -204,7 +204,7 @@ route("/api") {
         val requestDTO = call.receive<RequestDTO>()
         checkVeilederTilgang(
             action = "write person",
-            personident = requestDTO.personident,
+            personIdent = requestDTO.personIdent,
             veilederTilgangskontrollClient = tilgangskontrollClient,
             requiresWriteAccess = true,
         ) {

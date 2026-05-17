@@ -55,7 +55,7 @@ class TilgangskontrollClient(
         .description("Counts the number of forbidden calls to istilgangskontroll - person")
         .register(meterRegistry)
 
-    private suspend fun getTilgang(callId: String, personident: String, token: String): Tilgang? {
+    private suspend fun getTilgang(callId: String, personIdent: String, token: String): Tilgang? {
         val onBehalfOfToken = oboTokenProvider.getOnBehalfOfToken(
             scopeClientId = config.clientId,
             token = token
@@ -64,7 +64,7 @@ class TilgangskontrollClient(
         return try {
             val tilgangResponse = httpClient.get(tilgangskontrollPersonUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(onBehalfOfToken))
-                header(NAV_PERSONIDENT_HEADER, personident)
+                header(NAV_PERSONIDENT_HEADER, personIdent)
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
             }
@@ -96,11 +96,11 @@ class TilgangskontrollClient(
      * Returns true if the veileder has read access to the given person.
      *
      * @param callId Forwarded to istilgangskontroll as the `Nav-Call-Id` request header for tracing across services.
-     * @param personident The person's national identity number (fødselsnummer).
+     * @param personIdent The person's national identity number (fødselsnummer).
      * @param token The veileder's incoming Bearer token (without the "Bearer " prefix).
      */
-    suspend fun hasAccess(callId: String, personident: String, token: String): Boolean {
-        return getTilgang(callId, personident, token)?.erGodkjent ?: false
+    suspend fun hasAccess(callId: String, personIdent: String, token: String): Boolean {
+        return getTilgang(callId, personIdent, token)?.erGodkjent ?: false
     }
 
     /**
@@ -108,25 +108,25 @@ class TilgangskontrollClient(
      * Returns false if the veileder does not have access to the person, or if the veileder does not have fullTilgang.
      *
      * @param callId Forwarded to istilgangskontroll as the `Nav-Call-Id` request header for tracing across services.
-     * @param personident The person's national identity number (fødselsnummer).
+     * @param personIdent The person's national identity number (fødselsnummer).
      * @param token The veileder's incoming Bearer token (without the "Bearer " prefix).
      */
-    suspend fun hasWriteAccess(callId: String, personident: String, token: String): Boolean {
-        return getTilgang(callId, personident, token)?.let {
+    suspend fun hasWriteAccess(callId: String, personIdent: String, token: String): Boolean {
+        return getTilgang(callId, personIdent, token)?.let {
             it.erGodkjent && it.fullTilgang
         } ?: false
     }
 
     /**
-     * Returns the subset of [personidenter] that the veileder has access to.
+     * Returns the subset of [personIdenter] that the veileder has access to.
      * Returns null on error or if access is forbidden entirely.
      *
-     * @param personidenter List of national identity numbers (fødselsnummer) to check.
+     * @param personIdenter List of national identity numbers (fødselsnummer) to check.
      * @param token The veileder's incoming Bearer token (without the "Bearer " prefix).
      * @param callId Forwarded to istilgangskontroll as the `Nav-Call-Id` request header for tracing across services.
      */
-    suspend fun veilederPersonerAccess(
-        personidenter: List<String>,
+    suspend fun personsVeilederHasAccessTo(
+        personIdenter: List<String>,
         token: String,
         callId: String
     ): List<String>? {
@@ -141,7 +141,7 @@ class TilgangskontrollClient(
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
                 header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                setBody(personidenter)
+                setBody(personIdenter)
             }
             response.body<List<String>>()
         } catch (e: ClientRequestException) {
