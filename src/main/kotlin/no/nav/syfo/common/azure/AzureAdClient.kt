@@ -2,7 +2,8 @@ package no.nav.syfo.common.azure
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ResponseException
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.request.accept
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.post
@@ -34,8 +35,10 @@ class AzureAdClient(
         val cacheKey = "${CACHE_AZUREAD_TOKEN_SYSTEM_KEY_PREFIX}$scopeClientId"
         val cachedToken = cache.get(key = cacheKey)
         return if (cachedToken?.isExpired() == false) {
+            COUNT_CALL_AZUREAD_SYSTEM_TOKEN_CACHE_HIT.increment()
             cachedToken
         } else {
+            COUNT_CALL_AZUREAD_SYSTEM_TOKEN_CACHE_MISS.increment()
             val azureAdTokenResponse = getAccessToken(
                 Parameters.build {
                     append("client_id", azureEnvironment.appClientId)
@@ -61,17 +64,19 @@ class AzureAdClient(
                 setBody(FormDataContent(formParameters))
             }
             response.body<AzureAdTokenResponse>()
-        } catch (e: ResponseException) {
-            handleUnexpectedResponseException(e)
+        } catch (e: ClientRequestException) {
+            log.error(
+                "Client error while requesting AzureAD access token with statusCode=${e.response.status.value}",
+                e
+            )
+            null
+        } catch (e: ServerResponseException) {
+            log.error(
+                "Server error while requesting AzureAD access token with statusCode=${e.response.status.value}",
+                e
+            )
             null
         }
-
-    private fun handleUnexpectedResponseException(responseException: ResponseException) {
-        log.error(
-            "Error while requesting AzureAdAccessToken with statusCode=${responseException.response.status.value}",
-            responseException
-        )
-    }
 
     companion object {
         private const val CACHE_AZUREAD_TOKEN_SYSTEM_KEY_PREFIX = "azuread-token-system-"

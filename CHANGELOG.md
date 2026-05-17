@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.0.16]
+
+### Changed
+- `AzureAdClient`: added cache hit/miss metrics for system token requests (`call_azuread_system_token_cache_hit_count`, `call_azuread_system_token_cache_miss_count`), registered on `Metrics.globalRegistry`.
+- `AzureAdClient`: split error handling into separate `ClientRequestException` (4xx) and `ServerResponseException` (5xx) catch blocks for more informative error logging.
+
 ## [0.0.15]
 
 ### Changed

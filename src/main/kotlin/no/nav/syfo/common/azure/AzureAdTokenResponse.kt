@@ -9,9 +9,9 @@ internal data class AzureAdTokenResponse(
 )
 
 internal fun AzureAdTokenResponse.toAzureAdToken(): AzureAdToken {
-    val expiresOn = LocalDateTime.now().plusSeconds(this.expires_in)
+    val expiresIn = LocalDateTime.now().plusSeconds(this.expires_in)
     return AzureAdToken(
         accessToken = this.access_token,
-        expires = expiresOn
+        expires = expiresIn
     )
 }
