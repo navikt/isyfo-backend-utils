@@ -14,9 +14,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.micrometer.core.instrument.Counter
-import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Metrics
 import no.nav.syfo.common.token.OboTokenProvider
 import no.nav.syfo.common.http.defaultHttpClient
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
@@ -34,26 +31,14 @@ import org.slf4j.LoggerFactory
  * directly, or wrap a custom token source in a lambda: `{ scopeClientId, token -> ... }`.
  * @param config Base URL and Nais scope identifier for istilgangskontroll.
  * @param httpClient HTTP client to use. Defaults to [defaultHttpClient]. Override in tests with a mock engine.
- * @param meterRegistry Micrometer registry for recording success/fail/forbidden counters. Defaults to the global registry.
  */
 class TilgangskontrollClient(
     private val oboTokenProvider: OboTokenProvider,
     private val config: TilgangskontrollClientConfig,
     private val httpClient: HttpClient = defaultHttpClient(),
-    meterRegistry: MeterRegistry = Metrics.globalRegistry
 ) {
     private val tilgangskontrollPersonUrl = "${config.baseUrl}$TILGANGSKONTROLL_PERSON_PATH"
     private val tilgangskontrollBrukereUrl = "${config.baseUrl}$TILGANGSKONTROLL_BRUKERE_PATH"
-
-    private val countSuccess = Counter.builder(CALL_TILGANGSKONTROLL_PERSON_SUCCESS)
-        .description("Counts the number of successful calls to istilgangskontroll - person")
-        .register(meterRegistry)
-    private val countFail = Counter.builder(CALL_TILGANGSKONTROLL_PERSON_FAIL)
-        .description("Counts the number of failed calls to istilgangskontroll - person")
-        .register(meterRegistry)
-    private val countForbidden = Counter.builder(CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN)
-        .description("Counts the number of forbidden calls to istilgangskontroll - person")
-        .register(meterRegistry)
 
     private suspend fun getTilgang(callId: String, personIdent: String, token: String): Tilgang? {
         val onBehalfOfToken = oboTokenProvider.getOnBehalfOfToken(
@@ -68,14 +53,14 @@ class TilgangskontrollClient(
                 header(NAV_CALL_ID_HEADER, callId)
                 accept(ContentType.Application.Json)
             }
-            countSuccess.increment()
+            COUNT_CALL_TILGANGSKONTROLL_PERSON_SUCCESS.increment()
             tilgangResponse.body<Tilgang>()
         } catch (e: ResponseException) {
             if (e.response.status == HttpStatusCode.Forbidden) {
-                countForbidden.increment()
+                COUNT_CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN.increment()
             } else {
                 handleUnexpectedResponseException(e.response, callId)
-                countFail.increment()
+                COUNT_CALL_TILGANGSKONTROLL_PERSON_FAIL.increment()
             }
             null
         }
@@ -163,10 +148,5 @@ class TilgangskontrollClient(
 
         private const val TILGANGSKONTROLL_PERSON_PATH = "/api/tilgang/navident/person"
         private const val TILGANGSKONTROLL_BRUKERE_PATH = "/api/tilgang/navident/brukere"
-
-        private const val CALL_TILGANGSKONTROLL_PERSON_BASE = "tilgangskontroll_person"
-        private const val CALL_TILGANGSKONTROLL_PERSON_SUCCESS = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_success_count"
-        private const val CALL_TILGANGSKONTROLL_PERSON_FAIL = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_fail_count"
-        private const val CALL_TILGANGSKONTROLL_PERSON_FORBIDDEN = "${CALL_TILGANGSKONTROLL_PERSON_BASE}_forbidden_count"
     }
 }
