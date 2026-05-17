@@ -10,13 +10,13 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.Parameters
-import no.nav.syfo.common.http.httpClientProxy
+import no.nav.syfo.common.http.proxyHttpClient
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
 class AzureAdClient(
     private val azureEnvironment: AzureEnvironment,
-    private val httpClient: HttpClient = httpClientProxy()
+    private val httpClient: HttpClient = proxyHttpClient()
 ) : OboTokenProvider {
     override suspend fun getOnBehalfOfToken(scopeClientId: String, token: String): String? = getAccessToken(
         Parameters.build {

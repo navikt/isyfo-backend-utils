@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.0.14]
+
+### Changed
+- Renamed `HttpClientCommon.kt` to `CommonHttpClient.kt`.
+- Renamed `httpClientDefault()` to `defaultHttpClient()` and `httpClientProxy()` to `proxyHttpClient()` for more idiomatic Kotlin naming (qualifier first, type second).
+- Made `defaultHttpClient()`, `proxyHttpClient()`, and `commonConfig` public so consumers can use them directly.
+
 ## [0.0.13]
 
 ### Changed

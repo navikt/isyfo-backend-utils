@@ -18,7 +18,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
 import no.nav.syfo.common.azure.OboTokenProvider
-import no.nav.syfo.common.http.httpClientDefault
+import no.nav.syfo.common.http.defaultHttpClient
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.common.util.bearerHeader
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory
 class TilgangskontrollClient(
     private val oboTokenProvider: OboTokenProvider,
     private val config: TilgangskontrollClientConfig,
-    private val httpClient: HttpClient = httpClientDefault(),
+    private val httpClient: HttpClient = defaultHttpClient(),
     meterRegistry: MeterRegistry = Metrics.globalRegistry
 ) {
     private val tilgangskontrollPersonUrl = "${config.baseUrl}$TILGANGSKONTROLL_PERSON_PATH"

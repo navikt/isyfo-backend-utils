@@ -13,7 +13,7 @@ import no.nav.syfo.common.util.applyCommonJacksonConfig
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner
 import java.net.ProxySelector
 
-internal val commonConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
+val commonConfig: HttpClientConfig<out HttpClientEngineConfig>.() -> Unit = {
     install(ContentNegotiation) {
         jackson { applyCommonJacksonConfig() }
     }
@@ -35,5 +35,5 @@ internal val proxyConfig: HttpClientConfig<Apache5EngineConfig>.() -> Unit = {
     }
 }
 
-internal fun httpClientDefault() = HttpClient(Apache5, commonConfig)
-internal fun httpClientProxy() = HttpClient(Apache5, proxyConfig)
+fun defaultHttpClient() = HttpClient(Apache5, commonConfig)
+fun proxyHttpClient() = HttpClient(Apache5, proxyConfig)
