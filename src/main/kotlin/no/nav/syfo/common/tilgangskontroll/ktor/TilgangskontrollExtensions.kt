@@ -7,6 +7,17 @@ import no.nav.syfo.common.util.ktor.getBearerToken
 import no.nav.syfo.common.util.ktor.getCallId
 import no.nav.syfo.common.util.ktor.getPersonIdent
 
+/**
+ * Reads the `Nav-Personident` header from the request, checks access via [tilgangskontrollClient],
+ * and executes [block] if access is granted. Throws [VeilederTilgangForbiddenException] if denied.
+ *
+ * This overload reads the personident from the `Nav-Personident` request header automatically.
+ *
+ * @param action Short description of the action being performed, used in error messages.
+ * @param tilgangskontrollClient Client used to check access.
+ * @param requiresWriteAccess If true, checks for fullTilgang (write access) rather than read access.
+ * @param block The handler to execute if access is granted.
+ */
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
     tilgangskontrollClient: TilgangskontrollClient,
@@ -25,6 +36,18 @@ suspend fun RoutingContext.checkVeilederTilgang(
     )
 }
 
+/**
+ * Checks veileder access for an explicitly provided [personident], then executes [block] if granted.
+ * Throws [VeilederTilgangForbiddenException] if denied.
+ *
+ * Use this overload when the personident comes from the request body rather than the `Nav-Personident` header.
+ *
+ * @param action Short description of the action being performed, used in error messages.
+ * @param personident The person's national identity number to check access for.
+ * @param tilgangskontrollClient Client used to check access.
+ * @param requiresWriteAccess If true, checks for fullTilgang (write access) rather than read access.
+ * @param block The handler to execute if access is granted.
+ */
 suspend fun RoutingContext.checkVeilederTilgang(
     action: String,
     personident: String,

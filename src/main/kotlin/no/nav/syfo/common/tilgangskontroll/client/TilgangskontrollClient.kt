@@ -24,6 +24,18 @@ import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.common.util.bearerHeader
 import org.slf4j.LoggerFactory
 
+/**
+ * Client for istilgangskontroll — the isyfo service that checks what access a veileder has to a given person.
+ *
+ * Uses an [OboTokenProvider] to exchange the veileder's incoming token for an OBO token scoped to istilgangskontroll
+ * before making requests.
+ *
+ * @param oboTokenProvider Supplies OBO tokens for the veileder's token. Pass an [no.nav.syfo.common.azure.AzureAdClient]
+ * directly, or wrap a custom token source in a lambda: `{ scopeClientId, token -> ... }`.
+ * @param config Base URL and Nais scope identifier for istilgangskontroll.
+ * @param httpClient HTTP client to use. Defaults to [defaultHttpClient]. Override in tests with a mock engine.
+ * @param meterRegistry Micrometer registry for recording success/fail/forbidden counters. Defaults to the global registry.
+ */
 class TilgangskontrollClient(
     private val oboTokenProvider: OboTokenProvider,
     private val config: TilgangskontrollClientConfig,
@@ -80,16 +92,39 @@ class TilgangskontrollClient(
         )
     }
 
+    /**
+     * Returns true if the veileder has read access to the given person.
+     *
+     * @param callId Forwarded to istilgangskontroll as the `Nav-Call-Id` request header for tracing across services.
+     * @param personident The person's national identity number (fødselsnummer).
+     * @param token The veileder's incoming Bearer token (without the "Bearer " prefix).
+     */
     suspend fun hasAccess(callId: String, personident: String, token: String): Boolean {
         return getTilgang(callId, personident, token)?.erGodkjent ?: false
     }
 
+    /**
+     * Returns true if the veileder has write access (fullTilgang) to the given person.
+     * Returns false if the veileder does not have access to the person, or if the veileder does not have fullTilgang.
+     *
+     * @param callId Forwarded to istilgangskontroll as the `Nav-Call-Id` request header for tracing across services.
+     * @param personident The person's national identity number (fødselsnummer).
+     * @param token The veileder's incoming Bearer token (without the "Bearer " prefix).
+     */
     suspend fun hasWriteAccess(callId: String, personident: String, token: String): Boolean {
         return getTilgang(callId, personident, token)?.let {
             it.erGodkjent && it.fullTilgang
         } ?: false
     }
 
+    /**
+     * Returns the subset of [personidenter] that the veileder has access to.
+     * Returns null on error or if access is forbidden entirely.
+     *
+     * @param personidenter List of national identity numbers (fødselsnummer) to check.
+     * @param token The veileder's incoming Bearer token (without the "Bearer " prefix).
+     * @param callId Forwarded to istilgangskontroll as the `Nav-Call-Id` request header for tracing across services.
+     */
     suspend fun veilederPersonerAccess(
         personidenter: List<String>,
         token: String,
