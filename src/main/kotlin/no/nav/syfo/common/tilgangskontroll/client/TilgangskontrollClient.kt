@@ -17,7 +17,7 @@ import io.ktor.http.HttpStatusCode
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Metrics
-import no.nav.syfo.common.azure.OboTokenProvider
+import no.nav.syfo.common.token.OboTokenProvider
 import no.nav.syfo.common.http.defaultHttpClient
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory
  * Uses an [OboTokenProvider] to exchange the veileder's incoming token for an OBO token scoped to istilgangskontroll
  * before making requests.
  *
- * @param oboTokenProvider Supplies OBO tokens for the veileder's token. Pass an [no.nav.syfo.common.azure.AzureAdClient]
+ * @param oboTokenProvider Supplies OBO tokens for the veileder's token. Pass an [no.nav.syfo.common.token.azuread.AzureAdClient]
  * directly, or wrap a custom token source in a lambda: `{ scopeClientId, token -> ... }`.
  * @param config Base URL and Nais scope identifier for istilgangskontroll.
  * @param httpClient HTTP client to use. Defaults to [defaultHttpClient]. Override in tests with a mock engine.

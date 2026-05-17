@@ -1,4 +1,4 @@
-package no.nav.syfo.common.azure
+package no.nav.syfo.common.token.azuread
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics

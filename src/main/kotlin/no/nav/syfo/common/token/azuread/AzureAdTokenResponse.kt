@@ -1,4 +1,4 @@
-package no.nav.syfo.common.azure
+package no.nav.syfo.common.token.azuread
 
 import java.time.LocalDateTime
 

@@ -2,15 +2,17 @@
 
 Shared Kotlin/JVM utility library for isyfo backend services. Intended to grow with shared backend utilities over time.
 
-Some helpers are for Ktor apps, while non-Ktor apps can use parts of the library like `AzureAdClient` and `VeilederTilgangskontrollClient`.
+Some helpers are for Ktor apps, while non-Ktor apps can use parts of the library like `EntraIdClient` and `TilgangskontrollClient`.
 
 ## What it provides
 
-### Azure AD
-- `AzureAdClient` — Azure AD token exchange (system tokens and OBO tokens), usable with any downstream service
+### Token providers
+- `EntraIdClient` — acquires OBO and system tokens via the Nais token exchange sidecar (Texas) (recommended)
+- `AzureAdClient` — acquires OBO and system tokens directly from Azure AD (for apps not yet on the Nais token sidecar (Texas))
+- Both implement `OboTokenProvider`, making them interchangeable as a dependency for `TilgangskontrollClient`
 
 ### Veileder access control
-- `VeilederTilgangskontrollClient` — read/write access checks against `istilgangskontroll`
+- `TilgangskontrollClient` — read/write access checks against `istilgangskontroll`
 - Ktor convenience helpers such as `checkVeilederTilgang(...)`
 
 ## Adding the dependency in consumer apps
@@ -92,7 +94,46 @@ Remember to remove `mavenLocal()` before merging — it should not be in the fin
 
 ---
 
+## EntraIdClient (Texas)
+
+Uses the Nais token exchange sidecar (Texas) — no client credentials needed in the app. Texas handles caching, renewal, and communication with Entra ID.
+
+### Setup
+
+```kotlin
+val entraIdClient = EntraIdClient()
+// Reads NAIS_TOKEN_EXCHANGE_ENDPOINT and NAIS_TOKEN_ENDPOINT from environment automatically
+```
+
+### On-behalf-of tokens
+
+```kotlin
+val token = entraIdClient.getOnBehalfOfToken(
+    scopeClientId = "api://<cluster>.<namespace>.<app>/.default",
+    token = incomingToken,
+)
+```
+
+### System tokens (M2M)
+
+```kotlin
+val token = entraIdClient.getSystemToken(
+    scopeClientId = "api://<cluster>.<namespace>.<app>/.default",
+)
+```
+
+### Migrating from AzureAdClient
+
+Switching to `EntraIdClient` lets you simplify consuming apps:
+
+- **App code**: Remove the `AzureEnvironment` config and all reading of `AZURE_APP_CLIENT_ID`, `AZURE_APP_CLIENT_SECRET`, `AZURE_APP_WELL_KNOWN_URL`. Replace `AzureAdClient(azureEnvironment)` with `EntraIdClient()` — no arguments needed.
+- **Naiserator**: Remove `outbound.external: login.microsoftonline.com` — the app no longer calls Azure AD directly. Keep `azure.application.enabled: true`; the Texas sidecar still uses the app's Azure AD registration and injects `NAIS_TOKEN_EXCHANGE_ENDPOINT` and `NAIS_TOKEN_ENDPOINT` automatically.
+
+---
+
 ## AzureAdClient
+
+For apps not yet using the Nais token sidecar (Texas). Communicates directly with Azure AD. System tokens are cached in-memory per scope (refreshed 60 seconds before expiry). OBO tokens are not cached.
 
 ### Setup
 
@@ -109,18 +150,11 @@ val azureAdClient = AzureAdClient(azureEnvironment = azureEnvironment)
 
 ### System tokens
 
-System tokens are cached per scope to reduce unnecessary calls to Azure AD:
-- A cached token is reused if it's still valid
-- Tokens are considered expired when less than 60 seconds of lifetime remain
-- Cache is in memory and does not persist across restarts
-
 ```kotlin
 val token = azureAdClient.getSystemToken(scopeClientId = "api://my-service/.default")
 ```
 
 ### On-behalf-of tokens
-
-OBO tokens are not cached — each call results in a new token exchange. This is intentional: OBO tokens are user-scoped and short-lived, making caching add complexity without meaningful benefit.
 
 ```kotlin
 val token = azureAdClient.getOnBehalfOfToken(
@@ -142,9 +176,9 @@ val token = azureAdClient.getOnBehalfOfToken(
 ### Setup
 
 ```kotlin
-val tilgangskontrollClient = VeilederTilgangskontrollClient(
-    azureAdClient = azureAdClient,
-    config = VeilederTilgangConfig(
+val tilgangskontrollClient = TilgangskontrollClient(
+    oboTokenProvider = EntraIdClient(), // or AzureAdClient(...)
+    config = TilgangskontrollClientConfig(
         baseUrl = "https://istilgangskontroll",
         clientId = "dev-fss.teamsykefravr.istilgangskontroll",
     ),

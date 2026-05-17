@@ -1,4 +1,4 @@
-package no.nav.syfo.common.azure
+package no.nav.syfo.common.token.azuread
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -12,6 +12,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.Parameters
 import no.nav.syfo.common.http.proxyHttpClient
+import no.nav.syfo.common.token.OboTokenProvider
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 

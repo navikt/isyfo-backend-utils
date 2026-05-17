@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.0.17]
+
+### Added
+- `EntraIdClient`: new token client using the Nais token exchange sidecar (Texas) (`NAIS_TOKEN_EXCHANGE_ENDPOINT` for OBO, `NAIS_TOKEN_ENDPOINT` for M2M). No client credentials or caching needed — Texas handles it.
+- `OboTokenProvider` interface moved to `no.nav.syfo.common.token` (shared by both `AzureAdClient` and `EntraIdClient`).
+
+### Changed
+- Moved `AzureAdClient` and related classes from `no.nav.syfo.common.azure` to `no.nav.syfo.common.token.azuread`.
+- Updated README with token provider guidance, `EntraIdClient` usage, and corrected class names.
+
 ## [0.0.16]
 
 ### Changed

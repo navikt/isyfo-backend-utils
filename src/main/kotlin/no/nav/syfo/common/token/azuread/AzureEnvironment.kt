@@ -1,4 +1,4 @@
-package no.nav.syfo.common.azure
+package no.nav.syfo.common.token.azuread
 
 data class AzureEnvironment(
     val appClientId: String,
