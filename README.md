@@ -46,9 +46,23 @@ In CI, the `kotlin-build-deploy` workflow from `isworkflows` sets the environmen
 
 Locally, you can set the env var `GITHUB_TOKEN` (or `ORG_GRADLE_PROJECT_githubPassord`) to a GitHub personal access token with the `read:packages` scope. (You can use the same that you use with `NPM_AUTH_TOKEN` in frontend projects.) This will allow you to run Gradle tasks that need to fetch the library in consuming apps.
 
-### Notes
+---
 
-- The library depends only on the SLF4J API; consuming applications should provide their own logging backend.
+## Instrumentation
+
+### Logging
+
+The library uses SLF4J for logging and does not depend on any specific logging backend. Consuming apps own the binding (e.g. Logback). Structured log arguments use `logstash-logback-encoder`'s `StructuredArguments` — these are emitted as top-level JSON fields when the logstash encoder is active, making them queryable by field name in Kibana/Loki.
+
+### Metrics
+
+The library registers Micrometer counters on `Metrics.globalRegistry`. For these counters to appear in Prometheus scraping, the consuming app's `PrometheusMeterRegistry` must be wired into the global registry early in startup:
+
+```kotlin
+Metrics.addRegistry(METRICS_REGISTRY)
+```
+
+Without this, library counters will not be visible at the `/metrics` endpoint and will not be scraped.
 
 ---
 
