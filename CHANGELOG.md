@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.0.19]
+
+### Added
+- `no.nav.syfo.common.auth` package with shared JWT authentication utilities:
+  - `WellKnown` — OpenID Connect discovery document data class
+  - `getWellKnown()` — fetches and parses the discovery document at startup
+  - `JwtIssuer` and `JwtIssuerType` — issuer configuration for Ktor JWT authentication
+  - `installJwtAuthentication()` — Ktor plugin that configures JWT validation per issuer
+
 ## [0.0.18]
 
 ### Changed

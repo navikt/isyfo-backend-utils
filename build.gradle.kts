@@ -1,13 +1,14 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType
 
 group = "no.nav.syfo"
-version = "0.0.18"
+version = "0.0.19"
 description = "Shared Kotlin library for checking veileder access via istilgangskontroll"
 
 val jacksonDataTypeVersion = "2.21.2"
 val ktorVersion = "3.4.2"
 val logbackVersion = "1.5.32"
 val micrometerVersion = "1.16.4"
+val logstashVersion = "9.0"
 val mockkVersion = "1.14.9"
 val slf4jVersion = "2.0.17"
 
@@ -36,6 +37,7 @@ dependencies {
 
     // Logging facade only; consuming apps own the runtime binding
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion")
 
     // Serialization
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonDataTypeVersion")

@@ -15,6 +15,11 @@ Some helpers are for Ktor apps, while non-Ktor apps can use parts of the library
 - `TilgangskontrollClient` — read/write access checks against `istilgangskontroll`
 - Ktor convenience helpers such as `checkVeilederTilgang(...)`
 
+### JWT authentication
+- `installJwtAuthentication()` — Ktor plugin for validating incoming Azure AD JWTs
+- `getWellKnown()` — fetches the OpenID Connect discovery document at startup
+- `JwtIssuer` / `JwtIssuerType` — configuration types for JWT issuers
+
 ## Adding the dependency in consumer apps
 
 In the consumer app, add the following dependency coordinates to `build.gradle.kts`:
@@ -252,6 +257,34 @@ Required request headers when using the Ktor helper:
 - `Authorization: Bearer <token>`
 - `Nav-Call-Id`
 - `nav-personident` (if not providing personident as argument)
+
+---
+
+## JWT authentication
+
+### Setup
+
+```kotlin
+val wellKnown = getWellKnown(wellKnownUrl = environment.azure.appWellKnownUrl)
+
+application.installJwtAuthentication(
+    jwtIssuerList = listOf(
+        JwtIssuer(
+            acceptedAudienceList = listOf(environment.azure.appClientId),
+            jwtIssuerType = JwtIssuerType.INTERNAL_AZUREAD,
+            wellKnown = wellKnown,
+        )
+    )
+)
+```
+
+Routes are then protected using the Ktor `authenticate` block with the issuer type name:
+
+```kotlin
+authenticate(JwtIssuerType.INTERNAL_AZUREAD.name) {
+    get("/api/person") { ... }
+}
+```
 
 ---
 
