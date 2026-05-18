@@ -14,8 +14,8 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import no.nav.syfo.common.token.OboTokenProvider
 import no.nav.syfo.common.http.defaultHttpClient
+import no.nav.syfo.common.token.OboTokenProvider
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.common.util.bearerHeader
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory
 class TilgangskontrollClient(
     private val oboTokenProvider: OboTokenProvider,
     private val config: TilgangskontrollClientConfig,
-    private val httpClient: HttpClient = defaultHttpClient(),
+    private val httpClient: HttpClient = defaultHttpClient()
 ) {
     private val tilgangskontrollPersonUrl = "${config.baseUrl}$TILGANGSKONTROLL_PERSON_PATH"
     private val tilgangskontrollBrukereUrl = "${config.baseUrl}$TILGANGSKONTROLL_BRUKERE_PATH"

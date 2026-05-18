@@ -8,9 +8,9 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.common.token.OboTokenProvider
 import no.nav.syfo.common.http.commonConfig
 import no.nav.syfo.common.testhelper.respond
+import no.nav.syfo.common.token.OboTokenProvider
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull

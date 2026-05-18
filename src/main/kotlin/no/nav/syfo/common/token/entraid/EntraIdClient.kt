@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory
 class EntraIdClient(
     private val tokenExchangeEndpoint: String = System.getenv("NAIS_TOKEN_EXCHANGE_ENDPOINT"),
     private val tokenEndpoint: String = System.getenv("NAIS_TOKEN_ENDPOINT"),
-    private val httpClient: HttpClient = defaultHttpClient(),
+    private val httpClient: HttpClient = defaultHttpClient()
 ) : OboTokenProvider {
     /**
      * Exchanges the veileder's incoming token for an OBO token scoped to the given [scopeClientId].
@@ -45,7 +45,7 @@ class EntraIdClient(
                     EntraIdTokenExchangeRequest(
                         identityProvider = IDENTITY_PROVIDER,
                         target = scopeClientId,
-                        userToken = token,
+                        userToken = token
                     )
                 )
             }
@@ -79,7 +79,7 @@ class EntraIdClient(
                 setBody(
                     EntraIdTokenRequest(
                         identityProvider = IDENTITY_PROVIDER,
-                        target = scopeClientId,
+                        target = scopeClientId
                     )
                 )
             }

@@ -9,10 +9,10 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.syfo.common.token.OboTokenProvider
 import no.nav.syfo.common.http.commonConfig
 import no.nav.syfo.common.testhelper.receiveBody
 import no.nav.syfo.common.testhelper.respond
+import no.nav.syfo.common.token.OboTokenProvider
 import no.nav.syfo.common.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.common.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.common.util.bearerHeader
